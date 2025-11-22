@@ -2,7 +2,6 @@
   "name": "contracts",
   "version": "1.0.0",
   "description": "Smart contracts for Omnichain Intent Settlement Layer",
-  "type": "module",
   "main": "index.js",
   "scripts": {
     "compile": "hardhat compile",
@@ -29,7 +28,7 @@
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "chai": "^4.3.7",
-    "hardhat": "^3.0.15",
+    "hardhat": "^2.27.0",
     "mocha": "^10.2.0",
     "ts-node": "^10.9.1",
     "tsx": "^4.20.6",
@@ -38,10 +37,10 @@
     "zod": "^3.25.76"
   },
   "dependencies": {
-    "@chainlink/contracts": "^1.1.1",
+    "@chainlink/contracts": "^1.5.0",
     "@layerzerolabs/lz-evm-oapp-v2": "^2.3.0",
     "@layerzerolabs/lz-evm-protocol-v2": "^2.3.0",
-    "@openzeppelin/contracts": "^5.0.2",
+    "@openzeppelin/contracts": "^5.4.0",
     "dotenv": "^16.3.1",
     "ethers": "^6.8.0"
   },

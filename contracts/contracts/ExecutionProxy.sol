@@ -1,18 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {OApp, MessagingFee, MessagingReceipt, OFT} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OApp.sol";
+import {OApp, MessagingFee, MessagingReceipt, Origin} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OApp.sol";
+import {OFT} from "@layerzerolabs/lz-evm-oapp-v2/contracts/oft/OFT.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
 /**
  * @title ExecutionProxy
  * @notice Proxy for executing cross-chain intents with LayerZero OFT extension
  * @dev Extends OFT to enable atomic settlement of omnichain swaps
  */
-contract ExecutionProxy is OFT, ReentrancyGuard {
+contract ExecutionProxy is OApp, ReentrancyGuard {
     struct CrossChainSwap {
         uint256 intentId;
         address user;
@@ -52,7 +53,7 @@ contract ExecutionProxy is OFT, ReentrancyGuard {
         address _endpoint,
         address _owner,
         address _intentManager
-    ) OFT(_token, _endpoint, _owner) Ownable(_owner) {
+    ) OApp(_endpoint, _owner) Ownable(_owner) {
         intentManager = _intentManager;
     }
 
