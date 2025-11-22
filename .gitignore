@@ -65,5 +65,9 @@ dump.rdb
 tmp/
 temp/
 
+# Markdown documentation files (to be pushed later)
+*.md
+!README.md
+
 # Backend contract addresses
 backend/.contract-addresses.json
