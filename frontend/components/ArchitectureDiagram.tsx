@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { User, Brain, Network, Zap, Shield, Database } from 'lucide-react';
+import Image from 'next/image';
 
 interface Node {
   id: string;
@@ -10,6 +11,7 @@ interface Node {
   position: { x: number; y: number };
   color: string;
   connections: string[];
+  logo?: string | null;
 }
 
 export function ArchitectureDiagram() {
@@ -21,6 +23,7 @@ export function ArchitectureDiagram() {
       position: { x: 20, y: 50 },
       color: 'from-blue-500 to-cyan-500',
       connections: ['agents'],
+      logo: null,
     },
     {
       id: 'agents',
@@ -29,6 +32,7 @@ export function ArchitectureDiagram() {
       position: { x: 50, y: 20 },
       color: 'from-purple-500 to-pink-500',
       connections: ['execution', 'layerzero'],
+      logo: null,
     },
     {
       id: 'execution',
@@ -37,6 +41,7 @@ export function ArchitectureDiagram() {
       position: { x: 80, y: 50 },
       color: 'from-green-500 to-emerald-500',
       connections: [],
+      logo: null,
     },
     {
       id: 'layerzero',
@@ -45,6 +50,7 @@ export function ArchitectureDiagram() {
       position: { x: 50, y: 50 },
       color: 'from-indigo-500 to-purple-500',
       connections: ['execution'],
+      logo: '/logos/layerzero-network-seeklogo.png',
     },
     {
       id: 'chainlink',
@@ -53,6 +59,7 @@ export function ArchitectureDiagram() {
       position: { x: 50, y: 80 },
       color: 'from-orange-500 to-red-500',
       connections: ['agents'],
+      logo: '/logos/chainlink.png',
     },
     {
       id: 'filecoin',
@@ -61,6 +68,7 @@ export function ArchitectureDiagram() {
       position: { x: 20, y: 80 },
       color: 'from-yellow-500 to-orange-500',
       connections: ['agents'],
+      logo: '/logos/filecoin-fil-logo.png',
     },
   ];
 
@@ -149,7 +157,18 @@ export function ArchitectureDiagram() {
                 cursor-pointer group
               `}
             >
-              <Icon className="h-8 w-8 mb-1" />
+              {node.logo ? (
+                <div className="mb-1 relative w-10 h-10">
+                  <Image
+                    src={node.logo}
+                    alt={node.label}
+                    fill
+                    className="object-contain filter brightness-0 invert"
+                  />
+                </div>
+              ) : (
+                <Icon className="h-8 w-8 mb-1" />
+              )}
               <span className="text-xs font-semibold text-center px-2">{node.label}</span>
               
               {/* Glow effect on hover */}

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, Zap, Shield, Network, TrendingUp, FileText, Sparkles, Globe, Lock } from 'lucide-react';
+import Image from 'next/image';
 import { GlowingButton } from '@/components/GlowingButton';
 import { ParticleBackground } from '@/components/ParticleBackground';
 import { NeuralMeshBackground } from '@/components/NeuralMeshBackground';
@@ -187,12 +188,12 @@ export default function Home() {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { icon: Network, title: 'Omnichain Execution', desc: 'LayerZero v2', color: 'from-blue-500 to-cyan-500', badge: '150+ Chains' },
-            { icon: Sparkles, title: 'AI Solvers', desc: 'Chainlink CRE', color: 'from-purple-500 to-pink-500', badge: 'Llama 3.2' },
+            { icon: Network, title: 'Omnichain Execution', desc: 'LayerZero v2', color: 'from-blue-500 to-cyan-500', badge: '150+ Chains', logo: '/logos/layerzero-network-seeklogo.png' },
+            { icon: Sparkles, title: 'AI Solvers', desc: 'Chainlink CRE', color: 'from-purple-500 to-pink-500', badge: 'Llama 3.2', logo: '/logos/chainlink.png' },
             { icon: Shield, title: 'Identity Layer', desc: 'ENS Subnames', color: 'from-green-500 to-emerald-500', badge: 'Verified' },
             { icon: TrendingUp, title: 'Reputation & Slashing', desc: 'On-chain governance', color: 'from-orange-500 to-red-500', badge: 'Secure' },
             { icon: Lock, title: 'Atomic Settlement', desc: 'Cross-chain finality', color: 'from-indigo-500 to-purple-500', badge: 'Instant' },
-            { icon: Zap, title: 'MEV Rebate Engine', desc: 'Fair execution', color: 'from-yellow-500 to-orange-500', badge: 'Optimized' },
+            { icon: Zap, title: 'Verifiable Storage', desc: 'Filecoin Onchain Cloud', color: 'from-yellow-500 to-orange-500', badge: 'Optimized', logo: '/logos/filecoin-fil-logo.png' },
           ].map((feature, i) => (
             <motion.div
               key={i}
@@ -205,8 +206,18 @@ export default function Home() {
               <Card className="h-full hover:shadow-2xl transition-all duration-300 border-2 hover:border-indigo-300 dark:hover:border-indigo-700">
                 <CardHeader>
                   <div className="flex items-start justify-between mb-4">
-                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg`}>
-                      <feature.icon className="h-7 w-7 text-white" />
+                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg relative overflow-hidden`}>
+                      {feature.logo ? (
+                        <Image
+                          src={feature.logo}
+                          alt={feature.title}
+                          width={32}
+                          height={32}
+                          className="object-contain"
+                        />
+                      ) : (
+                        <feature.icon className="h-7 w-7 text-white" />
+                      )}
                     </div>
                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">
                       {feature.badge}
@@ -331,9 +342,12 @@ export default function Home() {
             </div>
             <div>
               <h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-gray-100">Built With</h3>
-              <ul className="space-y-2 text-gray-600 dark:text-gray-400">
-                <li>LayerZero v2</li>
-                <li>Chainlink CRE</li>
+              <div className="flex flex-wrap gap-4 items-center">
+                <Image src="/logos/layerzero-network-seeklogo.png" alt="LayerZero" width={120} height={40} className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                <Image src="/logos/chainlink.png" alt="Chainlink" width={120} height={40} className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                <Image src="/logos/filecoin-fil-logo.png" alt="Filecoin" width={120} height={40} className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+              </div>
+              <ul className="space-y-2 text-gray-600 dark:text-gray-400 mt-4">
                 <li>ENS Subnames</li>
                 <li>Llama 3.2</li>
               </ul>
