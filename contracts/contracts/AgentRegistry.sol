@@ -13,6 +13,7 @@ import "./interfaces/IErrors.sol";
  * @dev Supports cross-chain agent registration synchronization
  */
 contract AgentRegistry is Ownable, ReentrancyGuard, AccessControl {
+    
     bytes32 public constant SYNC_ROLE = keccak256("SYNC_ROLE"); // Role for cross-chain sync
     
     struct Agent {
