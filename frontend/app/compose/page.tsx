@@ -48,8 +48,8 @@ export default function ComposeIntentPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold mb-4">Compose Intent</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">Compose Intent</h1>
+          <p className="text-gray-600 dark:text-gray-400">
             Describe your goal in natural language. AI agents will compete to execute it optimally.
           </p>
         </motion.div>
@@ -60,14 +60,14 @@ export default function ComposeIntentPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-gray-100">
               Intent Description
             </label>
             <textarea
               value={intentSpec}
               onChange={(e) => setIntentSpec(e.target.value)}
               placeholder="e.g., Get me 5% yield on stablecoins across any chain; rebalance if rates change"
-              className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary min-h-[120px]"
+              className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[120px]"
               required
             />
           </motion.div>

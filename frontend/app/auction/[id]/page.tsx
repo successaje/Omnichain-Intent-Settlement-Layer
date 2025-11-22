@@ -51,8 +51,8 @@ export default function AuctionPage({ params }: { params: { id: string } }) {
     <div className="min-h-screen bg-background text-foreground py-12 antialiased">
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Live Auction</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">Live Auction</h1>
+          <p className="text-gray-600 dark:text-gray-400">
             Agents are competing to execute your intent. Review proposals and select the winner.
           </p>
         </div>
@@ -70,44 +70,44 @@ export default function AuctionPage({ params }: { params: { id: string } }) {
                   transition={{ delay: index * 0.1 }}
                   className={`p-6 rounded-xl border-2 ${
                     selectedProposal === proposal.proposalId
-                      ? 'border-primary bg-primary/10'
-                      : 'border-border bg-card'
-                  }`}
+                      ? 'border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                      : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                  } shadow-sm`}
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-xl font-semibold">Agent {proposal.agentId}</h3>
-                      <p className="text-sm text-muted-foreground">Specialized in yield optimization</p>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Agent {proposal.agentId}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Specialized in yield optimization</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-3xl font-bold text-primary">{proposal.expectedAPY}%</div>
-                      <div className="text-sm text-muted-foreground">Expected APY</div>
+                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{proposal.expectedAPY}%</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Expected APY</div>
                     </div>
                   </div>
 
                   <div className="grid md:grid-cols-3 gap-4 mb-4">
                     <div>
-                      <div className="text-sm text-muted-foreground">Cost</div>
-                      <div className="font-medium">{proposal.expectedCost} ETH</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Cost</div>
+                      <div className="font-medium text-gray-900 dark:text-gray-100">{proposal.expectedCost} ETH</div>
                     </div>
                     <div>
-                      <div className="text-sm text-muted-foreground">Confidence</div>
-                      <div className="font-medium">{(proposal.confidence * 100).toFixed(0)}%</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Confidence</div>
+                      <div className="font-medium text-gray-900 dark:text-gray-100">{(proposal.confidence * 100).toFixed(0)}%</div>
                     </div>
                     <div>
-                      <div className="text-sm text-muted-foreground">Timeline</div>
-                      <div className="font-medium">~24 hours</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Timeline</div>
+                      <div className="font-medium text-gray-900 dark:text-gray-100">~24 hours</div>
                     </div>
                   </div>
 
                   <div className="mb-4">
-                    <div className="text-sm text-muted-foreground mb-2">Confidence Score</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Confidence Score</div>
                     <div className="w-full bg-muted rounded-full h-2">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${proposal.confidence * 100}%` }}
                         transition={{ duration: 0.5 }}
-                        className="bg-primary h-2 rounded-full"
+                        className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full"
                       />
                     </div>
                   </div>
@@ -127,10 +127,10 @@ export default function AuctionPage({ params }: { params: { id: string } }) {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-8 p-6 rounded-xl border border-primary bg-primary/5"
+                className="mt-8 p-6 rounded-xl border-2 border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20"
               >
-                <h3 className="text-xl font-semibold mb-4">Ready to Execute</h3>
-                <p className="text-muted-foreground mb-4">
+                <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Ready to Execute</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
                   Selected agent proposal includes signed strategy and Filecoin proof CID.
                 </p>
                 <Button size="lg" className="w-full">

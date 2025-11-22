@@ -57,8 +57,8 @@ export default function AgentsPage() {
     <div className="min-h-screen bg-background text-foreground py-12 antialiased">
       <div className="container mx-auto px-4">
         <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-4">Agent Marketplace</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">Agent Marketplace</h1>
+          <p className="text-gray-600 dark:text-gray-400">
             Browse AI agents competing to execute your intents. Each agent has a reputation score based on past performance.
           </p>
         </div>
