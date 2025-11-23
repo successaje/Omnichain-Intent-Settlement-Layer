@@ -29,14 +29,14 @@ All data is stored on Filecoin network and referenced via Content IDs (CIDs) sto
 
 ## API Routes
 
-All Filecoin routes are exposed via the `FilecoinController` at `/api/filecoin`:
+All Filecoin routes are exposed via the [`FilecoinController`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.controller.ts) at `/api/filecoin`:
 
 ### 1. **POST `/api/filecoin/pin/json`**
 
 Pin JSON data to Filecoin storage.
 
-- **Controller**: `FilecoinController.pinJson()`
-- **Service**: `FilecoinService.pinJson()`
+- **Controller**: [`FilecoinController.pinJson()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.controller.ts#L22)
+- **Service**: [`FilecoinService.pinJson()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.service.ts#L30)
 - **Request Body**: 
   ```json
   {
@@ -67,8 +67,8 @@ Pin JSON data to Filecoin storage.
 
 Upload and pin files to Filecoin storage.
 
-- **Controller**: `FilecoinController.pinFile()`
-- **Service**: `FilecoinService.pinFile()`
+- **Controller**: [`FilecoinController.pinFile()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.controller.ts#L35)
+- **Service**: [`FilecoinService.pinFile()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.service.ts#L60)
 - **Request**: Multipart form data with `file` field
 - **Response**: 
   ```json
@@ -89,8 +89,8 @@ Upload and pin files to Filecoin storage.
 
 Retrieve data from Filecoin by Content ID (CID).
 
-- **Controller**: `FilecoinController.getByCid()`
-- **Service**: `FilecoinService.getByCid()`
+- **Controller**: [`FilecoinController.getByCid()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.controller.ts#L56)
+- **Service**: [`FilecoinService.getByCid()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.service.ts#L89)
 - **Parameters**: `cid` (path parameter)
 - **Response**: 
   ```json
@@ -110,8 +110,8 @@ Retrieve data from Filecoin by Content ID (CID).
 
 Verify if a CID exists on Filecoin network.
 
-- **Controller**: `FilecoinController.verifyCid()`
-- **Service**: `FilecoinService.verifyCid()`
+- **Controller**: [`FilecoinController.verifyCid()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.controller.ts#L69)
+- **Service**: [`FilecoinService.verifyCid()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.service.ts#L112)
 - **Parameters**: `cid` (path parameter)
 - **Response**: 
   ```json
@@ -131,16 +131,16 @@ Verify if a CID exists on Filecoin network.
 
 ## Backend Service Methods
 
-### FilecoinService (`backend/src/modules/filecoin/filecoin.service.ts`)
+### FilecoinService ([`backend/src/modules/filecoin/filecoin.service.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.service.ts))
 
-#### **`pinJson(data: any): Promise<string>`**
+#### **[`pinJson(data: any): Promise<string>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.service.ts#L30)**
 - **Description**: Pin JSON data to Filecoin and return CID
 - **Parameters**: `data` - Any JSON-serializable object
 - **Returns**: CID string
 - **Internal**: Calls Synapse SDK `/api/v1/pin/json` endpoint
 - **Fallback**: Returns mock CID if service unavailable
 
-#### **`pinFile(file: Buffer, filename: string): Promise<string>`**
+#### **[`pinFile(file: Buffer, filename: string): Promise<string>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.service.ts#L60)**
 - **Description**: Pin file/blob to Filecoin
 - **Parameters**: 
   - `file`: File buffer
@@ -148,13 +148,13 @@ Verify if a CID exists on Filecoin network.
 - **Returns**: CID string
 - **Internal**: Calls Synapse SDK `/api/v1/pin/file` endpoint with multipart form data
 
-#### **`getByCid(cid: string): Promise<any>`**
+#### **[`getByCid(cid: string): Promise<any>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.service.ts#L89)**
 - **Description**: Retrieve data from Filecoin by CID
 - **Parameters**: `cid` - Content ID
 - **Returns**: Decoded data object
 - **Internal**: Calls Synapse SDK `/api/v1/cat/{cid}` endpoint
 
-#### **`verifyCid(cid: string): Promise<boolean>`**
+#### **[`verifyCid(cid: string): Promise<boolean>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/filecoin/filecoin.service.ts#L112)**
 - **Description**: Verify CID exists on Filecoin
 - **Parameters**: `cid` - Content ID
 - **Returns**: `true` if CID exists, `false` otherwise
@@ -162,17 +162,17 @@ Verify if a CID exists on Filecoin network.
 
 ### Internal Service Usage
 
-#### **IntentsService** (`backend/src/modules/intents/intents.service.ts`)
-- **Route**: `POST /api/intents` (via `IntentsController`)
-- **Method**: `create()`
+#### **IntentsService** ([`backend/src/modules/intents/intents.service.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/intents/intents.service.ts))
+- **Route**: `POST /api/intents` (via [`IntentsController`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/intents/intents.controller.ts))
+- **Method**: [`create()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/intents/intents.service.ts#L16)
 - **Filecoin Usage**: 
   - Automatically stores intent metadata to Filecoin when creating intents
   - Stores: `intentSpec`, `userAddress`, `amount`, `tokenAddress`, `deadline`, `createdAt`
   - Returns CID in `filecoinCid` field of Intent entity
 
-#### **AgentsService** (`backend/src/modules/agents/agents.service.ts`)
-- **Route**: `POST /api/agents/:id/proposals` and `POST /api/agents/auction/:intentId/proposals`
-- **Method**: `generateProposal()`
+#### **AgentsService** ([`backend/src/modules/agents/agents.service.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/agents/agents.service.ts))
+- **Route**: `POST /api/agents/:id/proposals` and `POST /api/agents/auction/:intentId/proposals` (via [`AgentsController`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/agents/agents.controller.ts))
+- **Method**: [`generateProposal()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/agents/agents.service.ts#L40)
 - **Filecoin Usage**:
   - Stores agent proposal proofs on Filecoin
   - Stores: `intentId`, `agentId`, `strategy`, `marketData`, `generatedAt`, `llamaResponse`
@@ -184,11 +184,14 @@ Verify if a CID exists on Filecoin network.
 
 Filecoin CIDs are stored on-chain as `bytes32` values in the `IntentManager` contract.
 
-### IntentManager Contract (`contracts/contracts/IntentManager.sol`)
+### IntentManager Contract ([`contracts/contracts/IntentManager.sol`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol))
 
-**Contract Address**: Deployed per network (see deployment files)
+**Contract Address**: Deployed per network (see [`deployments/`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/tree/main/contracts/deployments))  
+**Deployment Script**: [`contracts/scripts/deploy.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/scripts/deploy.ts)
 
 #### **1. `createIntent()` - Store Filecoin CID with Intent**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L159)
 
 ```solidity
 function createIntent(
@@ -208,6 +211,8 @@ function createIntent(
 - **Storage**: CID stored in `Intent.filecoinCid` mapping
 
 #### **2. `submitProposal()` - Store Agent Proof CID**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L228)
 
 ```solidity
 function submitProposal(
@@ -233,14 +238,17 @@ function submitProposal(
 
 ```solidity
 // Get intent with Filecoin CID
+[`getIntent()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L617)
 function getIntent(uint256 _intentId) external view returns (Intent memory)
 // Returns: Intent struct containing filecoinCid field
 
 // Get proposal with proof CID
+[`getIntentProposals()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L621)
 function getIntentProposals(uint256 _intentId) external view returns (AgentProposal[] memory)
 // Returns: Array of proposals, each containing proofCid field
 
 // Get cross-chain intent data (includes Filecoin CID)
+[`getCrossChainIntent()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L633)
 function getCrossChainIntent(bytes32 _crossChainId) external view returns (CrossChainIntentData memory)
 // Returns: CrossChainIntentData containing filecoinCid
 ```
@@ -251,6 +259,7 @@ Filecoin CIDs are included in cross-chain messages via LayerZero and CCIP:
 
 ```solidity
 // In sendIntentToChain() - LayerZero
+// See: contracts/contracts/IntentManager.sol#L357
 ICrossChainIntent.CrossChainMessage memory message = ICrossChainIntent.CrossChainMessage({
     crossChainId: crossChainId,
     intentId: _intentId,
@@ -261,6 +270,7 @@ ICrossChainIntent.CrossChainMessage memory message = ICrossChainIntent.CrossChai
 });
 
 // In sendViaCCIP() - Chainlink CCIP
+// See: contracts/contracts/IntentManager.sol#L478
 ICrossChainIntent.CrossChainMessage memory message = ICrossChainIntent.CrossChainMessage({
     crossChainId: crossChainId,
     intentId: _intentId,
@@ -272,6 +282,8 @@ ICrossChainIntent.CrossChainMessage memory message = ICrossChainIntent.CrossChai
 ```
 
 ### Data Structures
+
+**Source**: [`contracts/contracts/IntentManager.sol`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol)
 
 ```solidity
 struct Intent {
@@ -331,35 +343,35 @@ struct CrossChainIntentData {
 
 ## Frontend Integration
 
-### useFilecoin Hook (`frontend/src/hooks/useFilecoin.ts`)
+### useFilecoin Hook ([`frontend/src/hooks/useFilecoin.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/frontend/src/hooks/useFilecoin.ts))
 
-#### **`pinJson(data: any): Promise<string>`**
+#### **[`pinJson(data: any): Promise<string>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/frontend/src/hooks/useFilecoin.ts#L30)**
 - Pin JSON data to Filecoin
 - Returns CID string
 
-#### **`pinFile(file: File): Promise<string>`**
+#### **[`pinFile(file: File): Promise<string>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/frontend/src/hooks/useFilecoin.ts#L50)**
 - Upload files to Filecoin
 - Returns CID string
 
-#### **`getByCid(cid: string): Promise<any>`**
+#### **[`getByCid(cid: string): Promise<any>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/frontend/src/hooks/useFilecoin.ts#L75)**
 - Retrieve data from Filecoin by CID
 - Returns decoded data
 
-#### **`verifyCid(cid: string): Promise<boolean>`**
+#### **[`verifyCid(cid: string): Promise<boolean>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/frontend/src/hooks/useFilecoin.ts#L95)**
 - Verify CID exists on Filecoin
 - Returns boolean
 
-#### **`cidToBytes32(cid: string): \`0x${string}\``**
+#### **[`cidToBytes32(cid: string): \`0x${string}\``](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/frontend/src/hooks/useFilecoin.ts#L120)**
 - Convert CID to bytes32 format for smart contracts
 - Handles padding/truncation
 
-#### **`getGatewayUrl(cid: string, gateway?: string): string`**
+#### **[`getGatewayUrl(cid: string, gateway?: string): string`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/frontend/src/hooks/useFilecoin.ts#L130)**
 - Get IPFS gateway URL for viewing CID
 - Default gateway: `https://ipfs.io/ipfs/`
 
 ### Components
 
-#### **FilecoinUpload** (`frontend/components/FilecoinUpload.tsx`)
+#### **FilecoinUpload** ([`frontend/components/FilecoinUpload.tsx`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/frontend/components/FilecoinUpload.tsx))
 - Drag-and-drop file upload
 - JSON metadata upload option
 - Progress indicators
@@ -371,7 +383,7 @@ struct CrossChainIntentData {
   - `accept?: string`
   - `maxSizeMB?: number`
 
-#### **FilecoinCidDisplay** (`frontend/components/FilecoinCidDisplay.tsx`)
+#### **FilecoinCidDisplay** ([`frontend/components/FilecoinCidDisplay.tsx`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/frontend/components/FilecoinCidDisplay.tsx))
 - Display CIDs with verification status
 - Copy to clipboard functionality
 - Link to IPFS gateway

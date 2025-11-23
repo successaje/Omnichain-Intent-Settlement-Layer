@@ -27,16 +27,16 @@ LayerZero integration provides:
 
 ## Backend Service Methods
 
-### LayerzeroService (`backend/src/modules/layerzero/layerzero.service.ts`)
+### LayerzeroService ([`backend/src/modules/layerzero/layerzero.service.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/layerzero/layerzero.service.ts))
 
 The LayerzeroService provides methods used internally (not exposed as direct API routes).
 
-#### **1. `sendCrossChainMessage(intentId, dstEid, payload, signer): Promise<string>`**
+#### **1. [`sendCrossChainMessage(intentId, dstEid, payload, signer): Promise<string>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/layerzero/layerzero.service.ts#L27)**
 
 Send cross-chain message via LayerZero OApp.
 
 - **Description**: Execute intents across different chains via LayerZero
-- **Contract**: Calls `IntentManager.sendCrossChainExecution()`
+- **Contract**: Calls [`IntentManager.sendIntentToChain()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L334)
 - **Parameters**:
   - `intentId`: Intent ID to execute
   - `dstEid`: Destination endpoint ID (LayerZero chain ID)
@@ -55,7 +55,7 @@ const txHash = await layerzeroService.sendCrossChainMessage(
 );
 ```
 
-#### **2. `getEndpointId(chainId: number): number`**
+#### **2. [`getEndpointId(chainId: number): number`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/layerzero/layerzero.service.ts#L69)**
 
 Get LayerZero endpoint ID for a given chain ID.
 
@@ -75,12 +75,12 @@ Get LayerZero endpoint ID for a given chain ID.
 const eid = layerzeroService.getEndpointId(8453); // Returns 30184 (Base)
 ```
 
-#### **3. `quoteFee(intentId, dstEid, payload): Promise<bigint>`**
+#### **3. [`quoteFee(intentId, dstEid, payload): Promise<bigint>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/layerzero/layerzero.service.ts#L85)**
 
 Quote cross-chain messaging fee.
 
 - **Description**: Estimate gas costs for cross-chain execution
-- **Contract**: Calls `IntentManager.quoteCrossChainFee()`
+- **Contract**: Calls [`IntentManager.quoteCrossChainFee()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L553)
 - **Parameters**:
   - `intentId`: Intent ID
   - `dstEid`: Destination endpoint ID
@@ -103,12 +103,15 @@ console.log(`Fee: ${ethers.formatEther(fee)} ETH`);
 
 ## Smart Contract Methods
 
-### IntentManager Contract (`contracts/contracts/IntentManager.sol`)
+### IntentManager Contract ([`contracts/contracts/IntentManager.sol`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol))
 
-**Contract Address**: Deployed per network (see deployment files)  
-**Inherits**: `OApp` from LayerZero OApp v2
+**Contract Address**: Deployed per network (see [`deployments/`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/tree/main/contracts/deployments))  
+**Inherits**: `OApp` from LayerZero OApp v2  
+**Deployment Script**: [`contracts/scripts/deploy.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/scripts/deploy.ts)
 
 #### **1. `sendIntentToChain()` - Send Cross-Chain Message via LayerZero**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L334)
 
 ```solidity
 function sendIntentToChain(
@@ -136,6 +139,8 @@ function sendIntentToChain(
 
 #### **2. `quoteCrossChainFee()` - Quote LayerZero Messaging Fee**
 
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L553)
+
 ```solidity
 function quoteCrossChainFee(
     uint32 _dstEid,
@@ -155,6 +160,8 @@ function quoteCrossChainFee(
 - **Internal**: Calls `_quote()` from OApp base contract
 
 #### **3. `_lzReceive()` - Handle Received LayerZero Message**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L408)
 
 ```solidity
 function _lzReceive(
@@ -177,6 +184,8 @@ function _lzReceive(
 
 #### **4. `sendViaCCIP()` - Send Intent via Chainlink CCIP (Alternative)**
 
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L453)
+
 ```solidity
 function sendViaCCIP(
     uint256 _intentId,
@@ -198,6 +207,8 @@ function sendViaCCIP(
 
 #### **5. `ccipReceive()` - Handle Received CCIP Message**
 
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L518)
+
 ```solidity
 function ccipReceive(
     ICCIPReceiver.Any2EVMMessage calldata _message
@@ -216,30 +227,39 @@ function ccipReceive(
 
 ```solidity
 // Add supported CCIP chain selector
+[`addChainSelector()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L567)
 function addChainSelector(uint64 _chainSelector) external onlyRole(DEFAULT_ADMIN_ROLE)
 
 // Remove chain selector
+[`removeChainSelector()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L575)
 function removeChainSelector(uint64 _chainSelector) external onlyRole(DEFAULT_ADMIN_ROLE)
 
 // Add executor for cross-chain execution
+[`addExecutor()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L583)
 function addExecutor(address _executor) external onlyRole(DEFAULT_ADMIN_ROLE)
 
 // Remove executor
+[`removeExecutor()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L591)
 function removeExecutor(address _executor) external onlyRole(DEFAULT_ADMIN_ROLE)
 
 // Add oracle address
+[`addOracle()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L601)
 function addOracle(address _oracle) external onlyRole(DEFAULT_ADMIN_ROLE)
 
 // Remove oracle address
+[`removeOracle()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/IntentManager.sol#L609)
 function removeOracle(address _oracle) external onlyRole(DEFAULT_ADMIN_ROLE)
 ```
 
-### ExecutionProxy Contract (`contracts/contracts/ExecutionProxy.sol`)
+### ExecutionProxy Contract ([`contracts/contracts/ExecutionProxy.sol`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol))
 
-**Contract Address**: Deployed per network (see deployment files)  
-**Inherits**: `OApp` from LayerZero OApp v2
+**Contract Address**: Deployed per network (see [`deployments/`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/tree/main/contracts/deployments))  
+**Inherits**: `OApp` from LayerZero OApp v2  
+**Deployment Script**: [`contracts/scripts/deploy.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/scripts/deploy.ts)
 
 #### **1. `initiateSwap()` - Cross-Chain Swap via LayerZero**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L76)
 
 ```solidity
 function initiateSwap(
@@ -269,6 +289,8 @@ function initiateSwap(
 
 #### **2. `batchExecuteIntent()` - Batch Cross-Chain Execution**
 
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L180)
+
 ```solidity
 function batchExecuteIntent(
     uint256[] calldata _intentIds,
@@ -290,6 +312,8 @@ function batchExecuteIntent(
 - **Usage**: Batch execute multiple intents atomically via LayerZero
 
 #### **3. `_lzReceive()` - Handle Received Swap**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L213)
 
 ```solidity
 function _lzReceive(
@@ -520,6 +544,7 @@ MessagingReceipt memory receipt = executionProxy.batchExecuteIntent{value: fee}(
 ### Cross-Chain Message Format
 
 ```solidity
+// Defined in contracts/contracts/interfaces/ICrossChainIntent.sol
 struct CrossChainMessage {
     bytes32 crossChainId;
     uint256 intentId;
@@ -530,6 +555,8 @@ struct CrossChainMessage {
 }
 ```
 
+**Source**: [`contracts/contracts/interfaces/ICrossChainIntent.sol`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/interfaces/ICrossChainIntent.sol)
+
 ### Domain Separation
 
 Messages use EIP-712 style domain separation:
@@ -538,10 +565,10 @@ Messages use EIP-712 style domain separation:
 
 ### Encoding/Decoding
 
-Messages are encoded/decoded using `CrossChainMessageLib`:
-- `encodeMessage()`: Encodes message with domain separator
-- `decodeMessage()`: Decodes and validates message
-- `verifyMessage()`: Verifies message integrity
+Messages are encoded/decoded using [`CrossChainMessageLib`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/libraries/CrossChainMessageLib.sol):
+- [`encodeMessage()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/libraries/CrossChainMessageLib.sol#L24): Encodes message with domain separator
+- [`decodeMessage()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/libraries/CrossChainMessageLib.sol#L41): Decodes and validates message
+- [`verifyMessage()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/libraries/CrossChainMessageLib.sol#L85): Verifies message integrity
 
 ---
 

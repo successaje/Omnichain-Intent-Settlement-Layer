@@ -26,11 +26,11 @@ Chainlink integration provides:
 
 ## Backend Service Methods
 
-### ChainlinkService (`backend/src/modules/chainlink/chainlink.service.ts`)
+### ChainlinkService ([`backend/src/modules/chainlink/chainlink.service.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/chainlink/chainlink.service.ts))
 
 The ChainlinkService provides methods used internally by other services (not exposed as direct API routes).
 
-#### **1. `getPriceFeed(address: string): Promise<{ price: bigint; timestamp: number }>`**
+#### **1. [`getPriceFeed(address: string): Promise<{ price: bigint; timestamp: number }>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/chainlink/chainlink.service.ts#L29)**
 
 Fetch latest price from Chainlink price feed.
 
@@ -40,7 +40,7 @@ Fetch latest price from Chainlink price feed.
 - **Returns**: 
   - `price`: Latest price as bigint
   - `timestamp`: Last update timestamp
-- **Contract**: Uses `AggregatorV3Interface.latestRoundData()` ABI
+- **Contract**: Uses [`AggregatorV3Interface.latestRoundData()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ChainlinkOracleAdapter.sol#L36) ABI
 - **Fallback**: Returns mock data if RPC not configured
 - **Usage**: Used by `AgentsService.fetchMarketData()` to get real-time token prices
 
@@ -51,7 +51,7 @@ const { price, timestamp } = await chainlinkService.getPriceFeed(
 );
 ```
 
-#### **2. `triggerCREWorkflow(workflowId: string, input: any): Promise<string>`**
+#### **2. [`triggerCREWorkflow(workflowId: string, input: any): Promise<string>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/chainlink/chainlink.service.ts#L60)**
 
 Trigger Chainlink Cross-Chain Resolver Engine (CRE) workflow.
 
@@ -73,7 +73,7 @@ const runId = await chainlinkService.triggerCREWorkflow(
 );
 ```
 
-#### **3. `getCREWorkflowStatus(workflowId: string, runId: string): Promise<any>`**
+#### **3. [`getCREWorkflowStatus(workflowId: string, runId: string): Promise<any>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/chainlink/chainlink.service.ts#L85)**
 
 Get status of CRE workflow execution.
 
@@ -94,7 +94,7 @@ const status = await chainlinkService.getCREWorkflowStatus(
 );
 ```
 
-#### **4. `callFunctions(source: string, args: string[]): Promise<string>`**
+#### **4. [`callFunctions(source: string, args: string[]): Promise<string>`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/chainlink/chainlink.service.ts#L108)**
 
 Call Chainlink Functions for off-chain data fetching.
 
@@ -118,13 +118,13 @@ const result = await chainlinkService.callFunctions(
 
 ### Routes Using Chainlink
 
-#### **AgentsService** (`backend/src/modules/agents/agents.service.ts`)
+#### **AgentsService** ([`backend/src/modules/agents/agents.service.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/agents/agents.service.ts))
 
 **Routes**:
-- `POST /api/agents/:id/proposals`
-- `POST /api/agents/auction/:intentId/proposals`
+- `POST /api/agents/:id/proposals` (via [`AgentsController`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/agents/agents.controller.ts#L8))
+- `POST /api/agents/auction/:intentId/proposals` (via [`AgentsController`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/agents/agents.controller.ts#L17))
 
-**Method**: `generateProposal()` → `fetchMarketData()`
+**Method**: [`generateProposal()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/agents/agents.service.ts#L40) → [`fetchMarketData()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/backend/src/modules/agents/agents.service.ts#L111)
 
 **Chainlink Usage**:
 - Fetches real-time price feeds via `ChainlinkService.getPriceFeed()`
@@ -142,12 +142,15 @@ const result = await chainlinkService.callFunctions(
 
 ## Smart Contract Methods
 
-### ChainlinkOracleAdapter Contract (`contracts/contracts/ChainlinkOracleAdapter.sol`)
+### ChainlinkOracleAdapter Contract ([`contracts/contracts/ChainlinkOracleAdapter.sol`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ChainlinkOracleAdapter.sol))
 
-**Contract Address**: Deployed per network (see deployment files)  
+**Contract Address**: Deployed per network (see [`deployments/`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/tree/main/contracts/deployments))  
+**Deployment Script**: [`contracts/scripts/deploy.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/scripts/deploy.ts)  
 **Inherits**: `Ownable` from OpenZeppelin
 
 #### **1. `addPriceFeed()` - Configure Chainlink Price Feed**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ChainlinkOracleAdapter.sol#L23)
 
 ```solidity
 function addPriceFeed(
@@ -168,6 +171,8 @@ function addPriceFeed(
 
 #### **2. `getLatestPrice()` - Get Current Price**
 
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ChainlinkOracleAdapter.sol#L36)
+
 ```solidity
 function getLatestPrice(address _token) external view returns (int256 price, uint256 timestamp)
 ```
@@ -186,6 +191,8 @@ function getLatestPrice(address _token) external view returns (int256 price, uin
 
 #### **3. `getValidatedPrice()` - Get Validated Price**
 
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ChainlinkOracleAdapter.sol#L61)
+
 ```solidity
 function getValidatedPrice(address _token) external view returns (int256 price, uint256 timestamp)
 ```
@@ -199,6 +206,8 @@ function getValidatedPrice(address _token) external view returns (int256 price, 
 - **Usage**: Get validated price for critical operations
 
 #### **4. `comparePrices()` - Compare Two Token Prices**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ChainlinkOracleAdapter.sol#L72)
 
 ```solidity
 function comparePrices(
@@ -216,12 +225,15 @@ function comparePrices(
 - **Usage**: Calculate exchange rates between tokens
 - **Example**: Compare ETH/USD vs USDC/USD for swap validation
 
-### ExecutionProxy Contract (`contracts/contracts/ExecutionProxy.sol`)
+### ExecutionProxy Contract ([`contracts/contracts/ExecutionProxy.sol`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol))
 
-**Contract Address**: Deployed per network (see deployment files)  
+**Contract Address**: Deployed per network (see [`deployments/`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/tree/main/contracts/deployments))  
+**Deployment Script**: [`contracts/scripts/deploy.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/scripts/deploy.ts)  
 **Inherits**: `OApp` from LayerZero OApp v2
 
 #### **1. `setPriceFeed()` - Configure Price Feed for Swap Validation**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L270)
 
 ```solidity
 function setPriceFeed(
@@ -239,6 +251,8 @@ function setPriceFeed(
 
 #### **2. `setPriceStalenessThreshold()` - Set Staleness Threshold**
 
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L284)
+
 ```solidity
 function setPriceStalenessThreshold(
     address _token,
@@ -255,6 +269,8 @@ function setPriceStalenessThreshold(
 - **Default**: 1 hour if not set
 
 #### **3. `getExpectedAmount()` - Calculate Expected Swap Amount**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L361)
 
 ```solidity
 function getExpectedAmount(
@@ -277,6 +293,8 @@ function getExpectedAmount(
 - **Usage**: Calculate expected output for cross-chain swaps
 
 #### **4. `initiateSwap()` - Cross-Chain Swap with Price Validation**
+
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L76)
 
 ```solidity
 function initiateSwap(
@@ -302,6 +320,8 @@ function initiateSwap(
 
 #### **5. `_getExpectedAmountWithValidation()` - Internal Price Calculation**
 
+[**Implementation**](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L296)
+
 ```solidity
 function _getExpectedAmountWithValidation(
     address _srcToken,
@@ -310,9 +330,9 @@ function _getExpectedAmountWithValidation(
 ) internal view returns (uint256)
 ```
 
-- **Internal Function**: Used by `initiateSwap()` and `_executeSwapWithValidation()`
+- **Internal Function**: Used by [`initiateSwap()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L76) and [`_executeSwapWithValidation()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L373)
 - **Chainlink Integration**:
-  - Fetches `AggregatorV3Interface.latestRoundData()` for both tokens
+  - Fetches [`AggregatorV3Interface.latestRoundData()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L312) for both tokens
   - Validates prices > 0
   - Checks staleness thresholds
   - Validates round completeness
@@ -347,7 +367,7 @@ function _getExpectedAmountWithValidation(
 
 ### Setup Script
 
-Use `contracts/scripts/setup-price-feeds.ts` to configure price feeds:
+Use [`contracts/scripts/setup-price-feeds.ts`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/scripts/setup-price-feeds.ts) to configure price feeds:
 
 ```bash
 cd contracts
@@ -406,6 +426,7 @@ CHAINLINK_FUNCTIONS_API_URL=https://api.chain.link/functions
 The service uses the following Chainlink ABI:
 
 ```solidity
+// Chainlink AggregatorV3Interface (from @chainlink/contracts)
 interface AggregatorV3Interface {
     function latestRoundData()
         external
@@ -419,6 +440,8 @@ interface AggregatorV3Interface {
         );
 }
 ```
+
+**Usage**: See [`ChainlinkOracleAdapter.getLatestPrice()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ChainlinkOracleAdapter.sol#L36) and [`ExecutionProxy._getExpectedAmountWithValidation()`](https://github.com/successaje/Omnichain-Intent-Settlement-Layer/blob/main/contracts/contracts/ExecutionProxy.sol#L296)
 
 ---
 
