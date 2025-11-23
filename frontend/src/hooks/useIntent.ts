@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount, useChainId, useContractWrite, useContractRead, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useChainId, useWriteContract, useContractRead, useWaitForTransactionReceipt } from "wagmi";
 import { parseEther, formatEther } from "viem";
 import { getContractAddress } from "@/src/config/contracts";
 import { parseIntentWithLlama } from "@/src/lib/ollama";
@@ -65,7 +65,7 @@ const INTENT_MANAGER_ABI = [
       { name: "amount", type: "uint256", indexed: false },
       { name: "filecoinCid", type: "bytes32", indexed: false },
     ],
-  },
+  },                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
 ] as const;
 
 export interface CreateIntentParams {
@@ -130,15 +130,19 @@ export function useIntent() {
 
   // Create intent function
   const {
-    write: createIntentWrite,
-    writeAsync: createIntentWriteAsync,
+    writeContractAsync: createIntentWriteAsync,
     data: createIntentData,
-    isLoading: isCreating,
+    isPending: isCreating,
     error: createError,
-  } = useContractWrite({
-    address: contractAddress,
-    abi: INTENT_MANAGER_ABI,
-    functionName: "createIntent",
+  } = useWriteContract({
+    mutation: {
+      onSuccess: (hash) => {
+        // Transaction submitted successfully
+      },
+      onError: (error) => {
+        console.error("Intent creation error:", error);
+      },
+    },
   });
 
   // Wait for transaction
@@ -147,7 +151,7 @@ export function useIntent() {
     isSuccess: isCreateSuccess,
     data: receipt,
   } = useWaitForTransactionReceipt({
-    hash: createIntentData?.hash,
+    hash: createIntentData,
   });
 
   /**
@@ -208,34 +212,28 @@ export function useIntent() {
     
     // For native ETH, the amount parameter should be 0 (value is sent via msg.value)
     // For ERC20 tokens, the amount parameter should be the token amount
-    const amountParam = token === "0x0000000000000000000000000000000000000000" ? 0n : value;
+    const amountParam = token === "0x0000000000000000000000000000000000000000" ? BigInt(0) : value;
 
     // Validate contract address
     if (!intentManagerAddress || intentManagerAddress === "0x0000000000000000000000000000000000000000") {
       throw new Error(`IntentManager contract not deployed on chain ${chainId}. Please switch to Sepolia (11155111) or Base Sepolia (84532).`);
     }
 
-    // Call contract - use writeAsync for better error handling
-    if (!createIntentWriteAsync && !createIntentWrite) {
-      throw new Error("Contract write function not available. Please check your wallet connection and ensure you're on Sepolia or Base Sepolia network.");
-    }
+        // Call contract - use writeContractAsync for better error handling
+        if (!createIntentWriteAsync) {
+          throw new Error("Contract write function not available. Please check your wallet connection and ensure you're on Sepolia or Base Sepolia network.");
+        }
 
-    // Prefer writeAsync for async/await pattern
-    // Note: createIntent signature: (string, bytes32, uint256, address, uint256)
-    // For native ETH: amountParam = 0, value = ETH amount in wei
-    // For ERC20: amountParam = token amount, value = 0
-    if (createIntentWriteAsync) {
-      await createIntentWriteAsync({
-        args: [params.intentSpec, filecoinCid, BigInt(deadline), token, amountParam],
-        value: value, // For native ETH deposits (msg.value)
-      });
-    } else if (createIntentWrite) {
-      // Fallback to synchronous write
-      createIntentWrite({
-        args: [params.intentSpec, filecoinCid, BigInt(deadline), token, amountParam],
-        value: value, // For native ETH deposits (msg.value)
-      });
-    }
+        // Note: createIntent signature: (string, bytes32, uint256, address, uint256)
+        // For native ETH: amountParam = 0, value = ETH amount in wei
+        // For ERC20: amountParam = token amount, value = 0
+        await createIntentWriteAsync({
+          address: contractAddress!,
+          abi: INTENT_MANAGER_ABI,
+          functionName: "createIntent",
+          args: [params.intentSpec, filecoinCid, BigInt(deadline), token, amountParam],
+          value: value, // For native ETH deposits (msg.value)
+        });
   };
 
   /**
@@ -266,7 +264,7 @@ export function useIntent() {
     isCreateSuccess,
     createError,
     receipt,
-    transactionHash: createIntentData?.hash,
+    transactionHash: createIntentData,
   };
 }
 

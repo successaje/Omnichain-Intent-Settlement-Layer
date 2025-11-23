@@ -1,7 +1,16 @@
+'use client';
+
 import React from 'react';
 import { motion } from 'framer-motion';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+// Exclude handlers that conflict with Framer Motion
+type ButtonHTMLAttributesWithoutConflicts = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration' |
+  'onDragStart' | 'onDrag' | 'onDragEnd'
+>;
+
+interface ButtonProps extends ButtonHTMLAttributesWithoutConflicts {
   variant?: 'default' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
@@ -17,9 +26,9 @@ export function Button({
   const baseClasses = 'font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
   
   const variantClasses = {
-    default: 'bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary',
-    outline: 'border border-border bg-transparent hover:bg-accent hover:text-accent-foreground',
-    ghost: 'hover:bg-accent hover:text-accent-foreground',
+    default: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600',
+    outline: 'border-2 border-gray-300 dark:border-gray-600 bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800',
+    ghost: 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800',
   };
 
   const sizeClasses = {
@@ -29,14 +38,17 @@ export function Button({
   };
 
   return (
-    <motion.button
+    <motion.div
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
-      {...props}
+      className="inline-block"
     >
-      {children}
-    </motion.button>
+      <button
+        className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+        {...props}
+      >
+        {children}
+      </button>
+    </motion.div>
   );
 }
-

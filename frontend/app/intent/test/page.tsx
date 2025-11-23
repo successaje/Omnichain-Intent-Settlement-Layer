@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useAccount, useChainId, useContractWrite, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useChainId, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import { getContractAddress } from '@/src/config/contracts';
 import { Button } from '@/components/ui/Button';
@@ -66,23 +66,18 @@ export default function TestIntentPage() {
   const contractAddress = isValidAddress ? (intentManagerAddress as `0x${string}`) : undefined;
 
   const {
-    write: createIntentWrite,
-    writeAsync: createIntentWriteAsync,
+    writeContractAsync: createIntentWriteAsync,
     data: txData,
-    isLoading: isWriting,
+    isPending: isWriting,
     error: writeError,
-  } = useContractWrite({
-    address: contractAddress,
-    abi: CREATE_INTENT_ABI,
-    functionName: "createIntent",
-  });
+  } = useWriteContract();
 
   const {
     isLoading: isWaiting,
     isSuccess: isTxSuccess,
     data: receipt,
   } = useWaitForTransactionReceipt({
-    hash: txData?.hash,
+    hash: txData,
   });
 
   const handleCreateIntent = async (intent: typeof SIMPLE_INTENTS[0]) => {
@@ -112,15 +107,14 @@ export default function TestIntentPage() {
 
       // Call contract
       if (!createIntentWriteAsync) {
-        throw new Error("Contract write function not available. Please check your wallet connection.");
-      }
-
-      if (!createIntentWriteAsync) {
         throw new Error("Contract write function not available. Please check your wallet connection and network.");
       }
 
       const hash = await createIntentWriteAsync({
-        args: [intent.spec, filecoinCid, BigInt(deadline), token, 0n], // amount = 0 for native ETH (value is sent via msg.value)
+        address: contractAddress!,
+        abi: CREATE_INTENT_ABI,
+        functionName: "createIntent",
+        args: [intent.spec, filecoinCid, BigInt(deadline), token, BigInt(0)], // amount = 0 for native ETH (value is sent via msg.value)
         value: value,
       });
 
@@ -276,13 +270,13 @@ export default function TestIntentPage() {
                     Transaction Confirmed!
                   </h3>
                 </div>
-                {txData?.hash && (
+                {txData && (
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-mono text-gray-900 dark:text-gray-100">
-                      {formatTxHash(txData.hash)}
+                      {formatTxHash(txData)}
                     </p>
                     <a
-                      href={getExplorerUrl(chainId, txData.hash)}
+                      href={getExplorerUrl(chainId, txData)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"

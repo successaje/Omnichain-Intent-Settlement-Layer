@@ -1,9 +1,16 @@
 'use client';
 
 import React from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
+// Exclude handlers that conflict with Framer Motion
+type ButtonHTMLAttributesWithoutConflicts = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration' |
+  'onDragStart' | 'onDrag' | 'onDragEnd'
+>;
+
+interface ButtonProps extends ButtonHTMLAttributesWithoutConflicts {
   variant?: 'default' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
@@ -14,9 +21,6 @@ export function Button({
   size = 'md',
   children,
   className = '',
-  onClick,
-  onMouseDown,
-  onMouseUp,
   ...props
 }: ButtonProps) {
   const baseClasses = 'font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
@@ -34,17 +38,17 @@ export function Button({
   };
 
   return (
-    <motion.button
+    <motion.div
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
-      onClick={onClick}
-      onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
-      {...props}
+      className="inline-block"
     >
-      {children}
-    </motion.button>
+      <button
+        className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+        {...props}
+      >
+        {children}
+      </button>
+    </motion.div>
   );
 }
-

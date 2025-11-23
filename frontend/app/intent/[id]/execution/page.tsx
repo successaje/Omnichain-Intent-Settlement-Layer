@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
+import { useChainId } from 'wagmi';
+import { ExternalLink } from 'lucide-react';
 import { ExecutionFlowGraph } from '@/components/ExecutionFlowGraph';
 import { IntentTimeline } from '@/components/IntentTimeline';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChainPill } from '@/components/ChainPill';
+import { formatTxHash, getExplorerUrl } from '@/lib/utils';
 
 export default function ExecutionVisualizerPage() {
   const params = useParams();

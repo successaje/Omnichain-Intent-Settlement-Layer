@@ -2,18 +2,23 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 
-export default function AuctionPage({ params }: { params: { id: string } }) {
+export default function AuctionPage() {
+  const params = useParams();
+  const id = params.id as string;
   const [proposals, setProposals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProposal, setSelectedProposal] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!id) return;
+    
     // Fetch proposals for intent
     const fetchProposals = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/agents/auction/${params.id}/proposals`, {
+        const response = await fetch(`http://localhost:3001/api/agents/auction/${id}/proposals`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -40,7 +45,7 @@ export default function AuctionPage({ params }: { params: { id: string } }) {
     };
 
     fetchProposals();
-  }, [params.id]);
+  }, [id]);
 
   const handleSelectAgent = (proposalId: string) => {
     setSelectedProposal(proposalId);
