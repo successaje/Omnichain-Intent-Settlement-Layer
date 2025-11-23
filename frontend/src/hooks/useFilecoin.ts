@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
 
 export interface PinJsonResponse {
   cid: string;
@@ -37,12 +37,28 @@ export function useFilecoin() {
 
   /**
    * Pin JSON data to Filecoin
+   * MOCK MODE: Returns mock CID immediately for demo purposes
    */
   const pinJson = async (data: any): Promise<string> => {
     setIsPinning(true);
     setError(null);
 
     try {
+      // MOCK: Return mock CID immediately for demo
+      // In production, this would call the backend API
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+      
+      // Generate a valid bytes32 mock CID (64 hex characters)
+      const randomHex = Array.from({ length: 64 }, () => 
+        Math.floor(Math.random() * 16).toString(16)
+      ).join('');
+      
+      const mockCid = randomHex; // bytes32 format (64 hex chars, no 0x prefix)
+      console.log('[Filecoin Mock] Returning mock CID (bytes32):', mockCid);
+      return mockCid;
+
+      // Original API call (commented out for demo):
+      /*
       const response = await fetch(`${API_BASE_URL}/api/filecoin/pin/json`, {
         method: "POST",
         headers: {
@@ -58,9 +74,19 @@ export function useFilecoin() {
 
       const result: PinJsonResponse = await response.json();
       return result.cid;
-    } catch (err) {
+      */
+    } catch (err: any) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       setError(errorMessage);
+      
+      // Provide helpful error message for connection issues
+      if (err.message?.includes('Failed to fetch') || err.message?.includes('ERR_CONNECTION_REFUSED')) {
+        throw new Error(
+          `Cannot connect to backend at ${API_BASE_URL}. ` +
+          `Please ensure the backend server is running on port 3001. ` +
+          `Run: cd backend && npm run start:dev`
+        );
+      }
       throw err;
     } finally {
       setIsPinning(false);

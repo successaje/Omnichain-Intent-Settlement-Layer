@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { FilecoinService } from './filecoin.service';
 import { FilecoinController } from './filecoin.controller';
-import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
-  imports: [HttpModule, ConfigModule],
+  imports: [ConfigModule, MulterModule.register()],
   controllers: [FilecoinController],
   providers: [FilecoinService],
   exports: [FilecoinService],

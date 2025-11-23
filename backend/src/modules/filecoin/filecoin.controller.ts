@@ -70,10 +70,33 @@ export class FilecoinController {
   async verifyCid(@Param('cid') cid: string) {
     try {
       const exists = await this.filecoinService.verifyCid(cid);
-      return { cid, exists, success: true };
+      const initialized = this.filecoinService.isInitialized();
+      return {
+        cid,
+        exists,
+        success: true,
+        initialized,
+        message: initialized
+          ? 'SDK initialized - real verification performed'
+          : 'SDK not initialized - set FILECOIN_PRIVATE_KEY to enable real verification',
+      };
     } catch (error) {
       return { cid, exists: false, success: false };
     }
+  }
+
+  /**
+   * Check Filecoin service status
+   */
+  @Get('status')
+  async getStatus() {
+    const initialized = this.filecoinService.isInitialized();
+    return {
+      initialized,
+      message: initialized
+        ? 'Filecoin Synapse SDK is initialized and ready'
+        : 'Filecoin Synapse SDK not initialized. Set FILECOIN_PRIVATE_KEY in .env to enable real Filecoin operations.',
+    };
   }
 }
 

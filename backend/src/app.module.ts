@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
 import { IntentsModule } from './modules/intents/intents.module';
 import { AgentsModule } from './modules/agents/agents.module';
 import { FilecoinModule } from './modules/filecoin/filecoin.module';
@@ -12,7 +13,10 @@ import { LayerzeroModule } from './modules/layerzero/layerzero.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      // Use absolute path to .env file
+      envFilePath: join(process.cwd(), '.env'),
+      // Enable expansion of variables
+      expandVariables: true,
     }),
     TypeOrmModule.forRoot({
       type: 'sqlite',

@@ -284,6 +284,72 @@ export default function IntentComposerPage() {
             />
           )}
 
+          {/* Technology Integrations */}
+          {parsedIntent && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+            >
+              <Card className="border-2 border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 dark:from-indigo-900/10 dark:to-purple-900/10">
+                <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                    Powered by Omnichain Technologies
+                  </CardTitle>
+                  <CardDescription>
+                    Your intent leverages cutting-edge infrastructure for secure, cross-chain execution
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {/* LayerZero */}
+                    <div className="p-4 rounded-lg bg-white/60 dark:bg-gray-800/60 border border-indigo-200 dark:border-indigo-800">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                        <h4 className="font-semibold text-gray-900 dark:text-gray-100">LayerZero</h4>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Cross-chain messaging for seamless intent execution across multiple blockchains
+                      </p>
+                      <div className="mt-2 text-xs text-indigo-600 dark:text-indigo-400">
+                        ✓ Omnichain Protocol
+                      </div>
+                    </div>
+
+                    {/* Chainlink */}
+                    <div className="p-4 rounded-lg bg-white/60 dark:bg-gray-800/60 border border-indigo-200 dark:border-indigo-800">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                        <h4 className="font-semibold text-gray-900 dark:text-gray-100">Chainlink</h4>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Price feeds and oracle data for secure, accurate intent settlement
+                      </p>
+                      <div className="mt-2 text-xs text-indigo-600 dark:text-indigo-400">
+                        ✓ Price Feeds
+                      </div>
+                    </div>
+
+                    {/* Filecoin */}
+                    <div className="p-4 rounded-lg bg-white/60 dark:bg-gray-800/60 border border-indigo-200 dark:border-indigo-800">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                        <h4 className="font-semibold text-gray-900 dark:text-gray-100">Filecoin</h4>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Decentralized storage for intent metadata and verifiable proof
+                      </p>
+                      <div className="mt-2 text-xs text-indigo-600 dark:text-indigo-400">
+                        ✓ Onchain Cloud
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
           {/* Filecoin Storage (Optional) */}
           {parsedIntent && (
             <motion.div
