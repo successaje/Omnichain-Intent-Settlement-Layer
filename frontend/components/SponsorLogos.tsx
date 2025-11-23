@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { ThemeAwareLogo } from './ThemeAwareLogo';
 
 interface SponsorLogosProps {
   size?: 'sm' | 'md' | 'lg';
@@ -17,9 +17,9 @@ export function SponsorLogos({ size = 'md', showLabels = false, className = '' }
   };
 
   const sponsors = [
-    { name: 'LayerZero', logo: '/logos/layerzero-network-seeklogo.png' },
-    { name: 'Chainlink', logo: '/logos/chainlink.png' },
-    { name: 'Filecoin', logo: '/logos/filecoin-fil-logo.png' },
+    { name: 'LayerZero', logo: 'layerzero' as const },
+    { name: 'Chainlink', logo: 'chainlink' as const },
+    { name: 'Filecoin', logo: 'filecoin' as const },
   ];
 
   return (
@@ -32,9 +32,8 @@ export function SponsorLogos({ size = 'md', showLabels = false, className = '' }
           transition={{ delay: i * 0.1 }}
           className="flex flex-col items-center gap-2"
         >
-          <Image
-            src={sponsor.logo}
-            alt={sponsor.name}
+          <ThemeAwareLogo
+            name={sponsor.logo}
             width={size === 'sm' ? 60 : size === 'md' ? 100 : 140}
             height={size === 'sm' ? 18 : size === 'md' ? 30 : 42}
             className={`${sizeClasses[size]} opacity-70 hover:opacity-100 transition-opacity`}

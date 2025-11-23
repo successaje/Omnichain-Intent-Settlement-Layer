@@ -42,8 +42,8 @@ export default function SettingsPage() {
           transition={{ delay: 0.1 }}
           className="mb-8"
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle className="flex items-center gap-2">
                 <Sun className="h-5 w-5" />
                 Theme
@@ -86,8 +86,8 @@ export default function SettingsPage() {
           transition={{ delay: 0.2 }}
           className="mb-8"
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle className="flex items-center gap-2">
                 <Network className="h-5 w-5" />
                 Chain Preferences
@@ -114,8 +114,8 @@ export default function SettingsPage() {
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle>ENS Profile</CardTitle>
               <CardDescription>Manage your ENS identity</CardDescription>
             </CardHeader>
@@ -139,8 +139,8 @@ export default function SettingsPage() {
           transition={{ delay: 0.4 }}
           className="mb-8"
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle className="flex items-center gap-2">
                 <Key className="h-5 w-5" />
                 API Keys
@@ -171,8 +171,8 @@ export default function SettingsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
                 Notifications

@@ -59,7 +59,7 @@ export function IntentTimeline({ events }: IntentTimelineProps) {
               <h4 className="font-semibold text-gray-900 dark:text-gray-100">
                 {event.title}
               </h4>
-              <span className="text-xs text-gray-500 dark:text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 {event.timestamp.toLocaleTimeString()}
               </span>
             </div>

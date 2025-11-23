@@ -3,13 +3,10 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Plus, TrendingUp, Clock, CheckCircle2 } from 'lucide-react';
-import Image from 'next/image';
-import { WalletConnectButton } from '@/components/WalletConnectButton';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { MetricCard } from '@/components/MetricCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { GlowingButton } from '@/components/GlowingButton';
-import { ChainPill } from '@/components/ChainPill';
+import { Navigation } from '@/components/Navigation';
 
 export default function DashboardPage() {
   const activeIntents = [
@@ -19,28 +16,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">
-      {/* Header */}
-      <header className="border-b-2 border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-              <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                OISL
-              </span>
-              <div className="hidden md:flex items-center gap-2 opacity-60">
-                <Image src="/logos/layerzero-network-seeklogo.png" alt="LayerZero" width={80} height={24} className="h-5 w-auto" />
-                <Image src="/logos/chainlink.png" alt="Chainlink" width={80} height={24} className="h-5 w-auto" />
-                <Image src="/logos/filecoin-fil-logo.png" alt="Filecoin" width={80} height={24} className="h-5 w-auto" />
-              </div>
-            </Link>
-            <div className="flex items-center gap-4">
-              <ChainPill chain="Ethereum" active />
-              <WalletConnectButton />
-              <ThemeToggle />
-            </div>
-          </div>
-        </div>
-      </header>
 
       <div className="container mx-auto px-4 py-12">
         {/* Portfolio Card */}
@@ -49,8 +24,8 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle>Portfolio</CardTitle>
               <CardDescription>Your cross-chain assets and intents</CardDescription>
             </CardHeader>
@@ -87,7 +62,7 @@ export default function DashboardPage() {
           transition={{ delay: 0.1 }}
           className="mb-8"
         >
-          <Card>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
             <CardContent className="p-8 text-center">
               <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
                 Ready to create a new intent?
@@ -111,8 +86,8 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle>Active Intents</CardTitle>
               <CardDescription>Your ongoing intent executions</CardDescription>
             </CardHeader>

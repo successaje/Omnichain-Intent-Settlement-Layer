@@ -153,7 +153,7 @@ export default function AgentMarketplacePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="h-full hover:shadow-lg transition-shadow">
+              <Card className="h-full border-2 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <AgentCard
                     agentId={agent.agentId}

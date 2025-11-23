@@ -48,7 +48,7 @@ export default function AuctionPage({ params }: { params: { id: string } }) {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-12 antialiased">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] py-12 antialiased">
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">Live Auction</h1>
@@ -58,7 +58,7 @@ export default function AuctionPage({ params }: { params: { id: string } }) {
         </div>
 
         {loading ? (
-          <div className="text-center py-12">Loading proposals...</div>
+          <div className="text-center py-12 text-gray-600 dark:text-gray-400">Loading proposals...</div>
         ) : (
           <div className="space-y-4">
             <AnimatePresence>
@@ -102,7 +102,7 @@ export default function AuctionPage({ params }: { params: { id: string } }) {
 
                   <div className="mb-4">
                     <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Confidence Score</div>
-                    <div className="w-full bg-muted rounded-full h-2">
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${proposal.confidence * 100}%` }}

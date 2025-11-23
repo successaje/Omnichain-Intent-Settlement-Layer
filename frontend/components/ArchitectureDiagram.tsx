@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { User, Brain, Network, Zap, Shield, Database } from 'lucide-react';
+import { ThemeAwareLogo } from './ThemeAwareLogo';
 import Image from 'next/image';
 
 interface Node {
@@ -50,7 +51,7 @@ export function ArchitectureDiagram() {
       position: { x: 50, y: 50 },
       color: 'from-indigo-500 to-purple-500',
       connections: ['execution'],
-      logo: '/logos/layerzero-network-seeklogo.png',
+      logo: 'layerzero',
     },
     {
       id: 'chainlink',
@@ -59,7 +60,7 @@ export function ArchitectureDiagram() {
       position: { x: 50, y: 80 },
       color: 'from-orange-500 to-red-500',
       connections: ['agents'],
-      logo: '/logos/chainlink.png',
+      logo: 'chainlink',
     },
     {
       id: 'filecoin',
@@ -68,7 +69,7 @@ export function ArchitectureDiagram() {
       position: { x: 20, y: 80 },
       color: 'from-yellow-500 to-orange-500',
       connections: ['agents'],
-      logo: '/logos/filecoin-fil-logo.png',
+      logo: 'filecoin',
     },
   ];
 
@@ -157,7 +158,16 @@ export function ArchitectureDiagram() {
                 cursor-pointer group
               `}
             >
-              {node.logo ? (
+              {node.logo && typeof node.logo === 'string' && ['layerzero', 'chainlink', 'filecoin'].includes(node.logo) ? (
+                <div className="mb-1 relative w-10 h-10 flex items-center justify-center">
+                  <ThemeAwareLogo
+                    name={node.logo as 'layerzero' | 'chainlink' | 'filecoin'}
+                    width={40}
+                    height={40}
+                    className="object-contain"
+                  />
+                </div>
+              ) : node.logo ? (
                 <div className="mb-1 relative w-10 h-10">
                   <Image
                     src={node.logo}

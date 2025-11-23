@@ -56,15 +56,15 @@ export function AgentCard({
       </div>
 
       <div className="flex items-center gap-2 mb-4">
-        <div className="text-sm">Rating:</div>
+        <div className="text-sm text-gray-600 dark:text-gray-400">Rating:</div>
         <div className="flex">
           {[...Array(5)].map((_, i) => (
-            <span key={i} className={i < Math.round(avgRating) ? 'text-yellow-400' : 'text-gray-300'}>
+            <span key={i} className={i < Math.round(avgRating) ? 'text-yellow-400 dark:text-yellow-500' : 'text-gray-300 dark:text-gray-600'}>
               ★
             </span>
           ))}
         </div>
-        <div className="text-sm">({avgRating.toFixed(1)})</div>
+        <div className="text-sm text-gray-600 dark:text-gray-400">({avgRating.toFixed(1)})</div>
       </div>
 
       {onClick && (

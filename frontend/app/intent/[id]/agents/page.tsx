@@ -102,7 +102,7 @@ export default function AgentBattleRoomPage() {
               transition={{ delay: 0.5 }}
               className="mt-8 max-w-4xl mx-auto"
             >
-              <Card>
+              <Card className="border-2 border-gray-200 dark:border-gray-700">
                 <CardContent className="p-6">
                   <h3 className="font-semibold mb-4 text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <Zap className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />

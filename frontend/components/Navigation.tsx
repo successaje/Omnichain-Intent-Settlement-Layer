@@ -4,10 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { LayoutDashboard, FileText, Users, Settings, Sparkles } from 'lucide-react';
-import Image from 'next/image';
 import { WalletConnectButton } from './WalletConnectButton';
 import { ThemeToggle } from './ThemeToggle';
-import { useTheme } from './ThemeContext';
+import { ThemeAwareLogo } from './ThemeAwareLogo';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -28,9 +27,9 @@ export function Navigation() {
               OISL
             </span>
             <div className="hidden lg:flex items-center gap-1.5 opacity-50">
-              <Image src="/logos/layerzero-network-seeklogo.png" alt="LayerZero" width={60} height={18} className="h-4 w-auto" />
-              <Image src="/logos/chainlink.png" alt="Chainlink" width={60} height={18} className="h-4 w-auto" />
-              <Image src="/logos/filecoin-fil-logo.png" alt="Filecoin" width={60} height={18} className="h-4 w-auto" />
+              <ThemeAwareLogo name="layerzero" width={60} height={18} className="h-4 w-auto" />
+              <ThemeAwareLogo name="chainlink" width={60} height={18} className="h-4 w-auto" />
+              <ThemeAwareLogo name="filecoin" width={60} height={18} className="h-4 w-auto" />
             </div>
           </Link>
           

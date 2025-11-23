@@ -9,6 +9,7 @@ import { ParticleBackground } from '@/components/ParticleBackground';
 import { NeuralMeshBackground } from '@/components/NeuralMeshBackground';
 import { ArchitectureDiagram } from '@/components/ArchitectureDiagram';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ThemeAwareLogo } from '@/components/ThemeAwareLogo';
 
 export default function Home() {
   return (
@@ -188,7 +189,7 @@ export default function Home() {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { icon: Network, title: 'Omnichain Execution', desc: 'LayerZero v2', color: 'from-blue-500 to-cyan-500', badge: '150+ Chains', logo: '/logos/layerzero-network-seeklogo.png' },
+            { icon: Network, title: 'Omnichain Execution', desc: 'LayerZero v2', color: 'from-blue-500 to-cyan-500', badge: '150+ Chains', logo: 'layerzero' },
             { icon: Sparkles, title: 'AI Solvers', desc: 'Chainlink CRE', color: 'from-purple-500 to-pink-500', badge: 'Llama 3.2', logo: '/logos/chainlink.png' },
             { icon: Shield, title: 'Identity Layer', desc: 'ENS Subnames', color: 'from-green-500 to-emerald-500', badge: 'Verified' },
             { icon: TrendingUp, title: 'Reputation & Slashing', desc: 'On-chain governance', color: 'from-orange-500 to-red-500', badge: 'Secure' },
@@ -205,9 +206,16 @@ export default function Home() {
             >
               <Card className="h-full hover:shadow-2xl transition-all duration-300 border-2 hover:border-indigo-300 dark:hover:border-indigo-700">
                 <CardHeader>
-                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start justify-between mb-4">
                     <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg relative overflow-hidden`}>
-                      {feature.logo ? (
+                      {feature.logo && typeof feature.logo === 'string' && ['layerzero', 'chainlink', 'filecoin'].includes(feature.logo) ? (
+                        <ThemeAwareLogo
+                          name={feature.logo as 'layerzero' | 'chainlink' | 'filecoin'}
+                          width={32}
+                          height={32}
+                          className="object-contain"
+                        />
+                      ) : feature.logo ? (
                         <Image
                           src={feature.logo}
                           alt={feature.title}
@@ -343,9 +351,9 @@ export default function Home() {
             <div>
               <h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-gray-100">Built With</h3>
               <div className="flex flex-wrap gap-4 items-center">
-                <Image src="/logos/layerzero-network-seeklogo.png" alt="LayerZero" width={120} height={40} className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
-                <Image src="/logos/chainlink.png" alt="Chainlink" width={120} height={40} className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
-                <Image src="/logos/filecoin-fil-logo.png" alt="Filecoin" width={120} height={40} className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                <ThemeAwareLogo name="layerzero" width={120} height={40} className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                <ThemeAwareLogo name="chainlink" width={120} height={40} className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
+                <ThemeAwareLogo name="filecoin" width={120} height={40} className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity" />
               </div>
               <ul className="space-y-2 text-gray-600 dark:text-gray-400 mt-4">
                 <li>ENS Subnames</li>

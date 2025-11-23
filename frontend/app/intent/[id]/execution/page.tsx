@@ -10,6 +10,7 @@ import { ChainPill } from '@/components/ChainPill';
 
 export default function ExecutionVisualizerPage() {
   const params = useParams();
+  const chainId = useChainId();
   const [currentStep, setCurrentStep] = useState(0);
 
   const steps = [
@@ -85,8 +86,8 @@ export default function ExecutionVisualizerPage() {
           transition={{ delay: 0.1 }}
           className="mb-12"
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle>Cross-Chain Execution Flow</CardTitle>
               <CardDescription>LayerZero omnichain execution visualization</CardDescription>
             </CardHeader>
@@ -103,8 +104,8 @@ export default function ExecutionVisualizerPage() {
           transition={{ delay: 0.2 }}
           className="mb-12"
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle>Chain Network</CardTitle>
             </CardHeader>
             <CardContent>
@@ -145,8 +146,8 @@ export default function ExecutionVisualizerPage() {
           transition={{ delay: 0.3 }}
           className="mb-12"
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle>Execution Timeline</CardTitle>
               <CardDescription>Step-by-step execution events</CardDescription>
             </CardHeader>
@@ -162,28 +163,42 @@ export default function ExecutionVisualizerPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card>
-            <CardHeader>
+          <Card className="border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle>Transaction List</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {[
-                  { hash: '0x1234...5678', chain: 'Ethereum', status: 'Confirmed' },
-                  { hash: '0xabcd...efgh', chain: 'Arbitrum', status: 'Pending' },
+                  { hash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef', chain: 'Ethereum', status: 'Confirmed' },
+                  { hash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890', chain: 'Arbitrum', status: 'Pending' },
                 ].map((tx, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700"
+                    className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition-shadow"
                   >
-                    <div>
-                      <p className="font-mono text-sm text-gray-900 dark:text-gray-100">{tx.hash}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-mono text-sm text-gray-900 dark:text-gray-100">{formatTxHash(tx.hash)}</p>
+                        <a
+                          href={getExplorerUrl(chainId, tx.hash)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          <ExternalLink className="h-3 w-3 text-gray-600 dark:text-gray-400" />
+                        </a>
+                      </div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">{tx.chain}</p>
                     </div>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      tx.status === 'Confirmed' 
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                        : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                    }`}>
                       {tx.status}
                     </span>
                   </motion.div>

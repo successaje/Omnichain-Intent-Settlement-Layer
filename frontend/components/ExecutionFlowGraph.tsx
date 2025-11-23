@@ -60,7 +60,7 @@ export function ExecutionFlowGraph({ steps }: ExecutionFlowGraphProps) {
                   {step.label}
                 </p>
                 {step.chain && (
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {step.chain}
                   </p>
                 )}

@@ -1,51 +1,146 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CheckCircle2, AlertTriangle, Zap } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertTriangle, Zap, Loader2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { IntentInputBox } from '@/components/IntentInputBox';
 import { AgentCard } from '@/components/AgentCard';
+import { AgentProfileModal } from '@/components/AgentProfileModal';
+import { AgentSlider } from '@/components/AgentSlider';
+import { AgentCompetitionLoader } from '@/components/AgentCompetitionLoader';
 import { GlowingButton } from '@/components/GlowingButton';
+import { LoadingScreen } from '@/components/LoadingScreen';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChainPill } from '@/components/ChainPill';
+import { Button } from '@/components/ui/Button';
+import { useIntent, CreateIntentParams } from '@/src/hooks/useIntent';
+import { parseIntentWithLlama, type IntentParseResult } from '@/src/lib/ollama';
+import { getExplorerUrl, formatTxHash } from '@/lib/utils';
+import { useChainId } from 'wagmi';
 
 export default function IntentComposerPage() {
   const router = useRouter();
   const [intent, setIntent] = useState('');
-  const [parsedIntent, setParsedIntent] = useState<any>(null);
+  const [parsedIntent, setParsedIntent] = useState<IntentParseResult | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [viewingAgent, setViewingAgent] = useState<any | null>(null);
+  const [isParsing, setIsParsing] = useState(false);
+  const [showCompetition, setShowCompetition] = useState(false);
+  const [competingAgents, setCompetingAgents] = useState<any[]>([]);
+  const [amount, setAmount] = useState('0.01');
+  const [deadline, setDeadline] = useState(24); // hours
 
-  const handleSubmit = (input: string) => {
+  const chainId = useChainId();
+  const { createIntent, isCreating, isWaiting, isCreateSuccess, createError, transactionHash } = useIntent();
+
+  // Handle intent parsing with Llama
+  const handleSubmit = async (input: string) => {
     setIntent(input);
-    // Mock AI interpretation
-    setParsedIntent({
-      objective: 'Maximize yield on stablecoins',
-      constraints: ['Low risk', 'Auto-rebalance'],
-      riskProfile: 'Medium',
-      chainsAllowed: ['Ethereum', 'Arbitrum', 'Base'],
-      assetsAllowed: ['USDC', 'USDT'],
-    });
+    setIsParsing(true);
+    
+    try {
+      const parsed = await parseIntentWithLlama(input);
+      setParsedIntent(parsed);
+      
+      // Extract amount if specified
+      if (parsed.amount) {
+        setAmount(parsed.amount);
+      }
+      
+      // Extract deadline if specified
+      if (parsed.deadline) {
+        setDeadline(parsed.deadline);
+      }
+    } catch (error) {
+      console.error("Error parsing intent:", error);
+      // Fallback to basic parsing
+      setParsedIntent({
+        objective: input,
+        constraints: [],
+        riskProfile: 'Medium',
+        chainsAllowed: ['Ethereum'],
+        assetsAllowed: [],
+      });
+    } finally {
+      setIsParsing(false);
+    }
   };
 
+  // Handle successful intent creation - show agent competition
+  useEffect(() => {
+    if (isCreateSuccess && transactionHash) {
+      // Show agent competition loader
+      setShowCompetition(true);
+      
+      // Simulate agents competing (in real app, this would come from contract events)
+      setTimeout(() => {
+        setCompetingAgents([
+          { id: '1', ensName: 'yield-master.solver.eth', apy: 7.2, proposal: 'Aave + Compound strategy', rank: 1 },
+          { id: '2', ensName: 'defi-expert.solver.eth', apy: 6.8, proposal: 'Yearn vault optimization', rank: 2 },
+          { id: '3', ensName: 'cross-chain-pro.solver.eth', apy: 7.5, proposal: 'Multi-chain yield farming', rank: 3 },
+        ]);
+      }, 2000);
+
+      // After showing competition, redirect to auction page
+      setTimeout(() => {
+        // Extract intent ID from transaction (would need to parse events)
+        // For now, use a mock ID
+        const intentId = '1'; // In real app, extract from transaction receipt
+        router.push(`/intent/${intentId}/agents`);
+      }, 8000);
+    }
+  }, [isCreateSuccess, transactionHash, router]);
+
   const agents = [
-    { id: '1', ensName: 'yield-master.solver.eth', reputation: 1250, stake: '10.5 ETH', specialization: 'Yield Optimization' },
-    { id: '2', ensName: 'defi-expert.solver.eth', reputation: 980, stake: '8.2 ETH', specialization: 'DeFi Strategy' },
-    { id: '3', ensName: 'cross-chain-pro.solver.eth', reputation: 1500, stake: '15.0 ETH', specialization: 'Cross-Chain' },
+    { id: '1', ensName: 'yield-master.solver.eth', reputation: 1250, stake: '10.5', specialization: 'Yield Optimization', completedIntents: 45, avgRating: 4.8, successRate: 98, tags: ['best-apy', 'fastest'], apy: 7.2, rank: 1 },
+    { id: '2', ensName: 'defi-expert.solver.eth', reputation: 980, stake: '8.2', specialization: 'DeFi Strategy', completedIntents: 32, avgRating: 4.6, successRate: 95, tags: ['cross-chain'], apy: 6.8, rank: 2 },
+    { id: '3', ensName: 'cross-chain-pro.solver.eth', reputation: 1500, stake: '15.0', specialization: 'Cross-Chain', completedIntents: 58, avgRating: 4.9, successRate: 99, tags: ['cross-chain', 'best-apy'], apy: 7.5, rank: 3 },
+    { id: '4', ensName: 'stable-yield.solver.eth', reputation: 1100, stake: '12.0', specialization: 'Stablecoin Focus', completedIntents: 38, avgRating: 4.7, successRate: 96, tags: ['stablecoins'], apy: 6.5, rank: 4 },
+    { id: '5', ensName: 'risk-optimizer.solver.eth', reputation: 920, stake: '9.5', specialization: 'Low Risk', completedIntents: 28, avgRating: 4.5, successRate: 94, tags: ['low-risk'], apy: 6.2, rank: 5 },
   ];
 
-  const handleFinalSubmit = () => {
-    if (selectedAgent) {
-      router.push(`/intent/1/agents`);
+  const handleFinalSubmit = async () => {
+    if (!intent.trim()) {
+      alert("Please enter an intent description");
+      return;
+    }
+
+    try {
+      const deadlineTimestamp = Math.floor(Date.now() / 1000) + (deadline * 3600);
+      
+      const params: CreateIntentParams = {
+        intentSpec: intent,
+        amount: amount,
+        token: "0x0000000000000000000000000000000000000000", // Native ETH
+        deadline: deadlineTimestamp,
+      };
+
+      await createIntent(params);
+    } catch (error: any) {
+      console.error("Error creating intent:", error);
+      alert(`Failed to create intent: ${error.message}`);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">
-      <div className="container mx-auto px-4 py-8">
+    <>
+      {(isCreating || isWaiting) && (
+        <LoadingScreen
+          message={isCreating ? "Creating Intent..." : "Waiting for confirmation..."}
+          subMessage="Please approve the transaction in your wallet"
+        />
+      )}
+      
+      {showCompetition && (
+        <AgentCompetitionLoader
+          agents={competingAgents}
+          isLoading={competingAgents.length === 0}
+        />
+      )}
+      <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">
+        <div className="container mx-auto px-4 py-8">
         <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 mb-8">
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
@@ -64,16 +159,28 @@ export default function IntentComposerPage() {
           </p>
 
           {/* Natural Language Input */}
-          <Card className="mb-8">
-            <CardHeader>
+          <Card className="mb-8 border-2 border-gray-200 dark:border-gray-700">
+            <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
               <CardTitle>Natural Language Input</CardTitle>
               <CardDescription>Describe what you want to achieve</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <IntentInputBox
                 onSubmit={handleSubmit}
-                isLoading={false}
+                isLoading={isParsing}
+                placeholder="Describe what you want: 'Find me best stablecoin yield across all chains'"
               />
+              
+              {isParsing && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+                >
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Parsing intent with Llama 3.2...
+                </motion.div>
+              )}
             </CardContent>
           </Card>
 
@@ -86,14 +193,14 @@ export default function IntentComposerPage() {
                 exit={{ opacity: 0, height: 0 }}
                 className="mb-8"
               >
-                <Card>
-                  <CardHeader>
+                <Card className="border-2 border-indigo-200 dark:border-indigo-800">
+                  <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
                     <CardTitle className="flex items-center gap-2">
                       <Zap className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                       AI Interpretation Preview
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-6">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Objective</p>
@@ -135,35 +242,42 @@ export default function IntentComposerPage() {
               animate={{ opacity: 1, y: 0 }}
               className="mb-8"
             >
-              <Card>
-                <CardHeader>
+              <Card className="border-2 border-gray-200 dark:border-gray-700">
+                <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
                   <CardTitle>Select Agent (Optional)</CardTitle>
-                  <CardDescription>Choose a preferred agent or let them compete</CardDescription>
+                  <CardDescription>Choose a preferred agent or let them compete. Top agent is pre-selected.</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {agents.map((agent) => (
-                      <motion.div
-                        key={agent.id}
-                        whileHover={{ scale: 1.02 }}
-                        onClick={() => setSelectedAgent(agent.id)}
-                      >
-                        <AgentCard
-                          agentId={agent.id}
-                          ensName={agent.ensName}
-                          specialization={agent.specialization}
-                          reputation={agent.reputation}
-                          stake={agent.stake}
-                          completedIntents={45}
-                          avgRating={4.8}
-                          onClick={() => setSelectedAgent(agent.id === selectedAgent ? null : agent.id)}
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
+                <CardContent className="pt-6">
+                  <AgentSlider
+                    agents={agents}
+                    selectedAgentId={selectedAgent}
+                    onSelectAgent={(agentId) => {
+                      setSelectedAgent(agentId);
+                      if (agentId) {
+                        const agent = agents.find(a => a.id === agentId);
+                        if (agent) {
+                          setViewingAgent(agent);
+                        }
+                      }
+                    }}
+                    autoSelectFirst={true}
+                  />
                 </CardContent>
               </Card>
             </motion.div>
+          )}
+
+          {/* Agent Profile Modal */}
+          {viewingAgent && (
+            <AgentProfileModal
+              agent={viewingAgent}
+              isOpen={!!viewingAgent}
+              onClose={() => setViewingAgent(null)}
+              onCompete={() => {
+                setSelectedAgent(viewingAgent.id);
+                setViewingAgent(null);
+              }}
+            />
           )}
 
           {/* Execution Preview */}
@@ -173,11 +287,11 @@ export default function IntentComposerPage() {
               animate={{ opacity: 1, y: 0 }}
               className="mb-8"
             >
-              <Card>
-                <CardHeader>
+              <Card className="border-2 border-gray-200 dark:border-gray-700">
+                <CardHeader className="border-b-2 border-gray-200 dark:border-gray-700">
                   <CardTitle>Execution Preview</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">Estimated Gas</span>
@@ -208,56 +322,67 @@ export default function IntentComposerPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center"
             >
-              <GlowingButton onClick={() => setShowConfirm(true)}>
-                Submit Intent
+              <GlowingButton 
+                onClick={handleFinalSubmit}
+                disabled={!intent.trim() || isCreating || isWaiting}
+                className="w-full max-w-md mx-auto"
+              >
+                {isCreating || isWaiting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {isCreating ? 'Creating Intent...' : 'Waiting for confirmation...'}
+                  </>
+                ) : isCreateSuccess ? (
+                  <>
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                    Intent Created!
+                  </>
+                ) : (
+                  'Create Intent'
+                )}
               </GlowingButton>
+              
+              {createError && (
+                <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg max-w-md mx-auto">
+                  <p className="text-sm text-red-600 dark:text-red-400">
+                    Error: {createError.message}
+                  </p>
+                </div>
+              )}
+              
+              {isCreateSuccess && transactionHash && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg max-w-md mx-auto"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-green-600 dark:text-green-400 mb-1">
+                        Intent created successfully!
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 font-mono">
+                        {formatTxHash(transactionHash)}
+                      </p>
+                    </div>
+                    <a
+                      href={getExplorerUrl(chainId, transactionHash)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                    >
+                      <ExternalLink className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    </a>
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
           )}
 
-          {/* Confirmation Modal */}
-          <AnimatePresence>
-            {showConfirm && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-                onClick={() => setShowConfirm(false)}
-              >
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full"
-                >
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-                    Confirm Intent Submission
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6">
-                    This will create your intent and start the agent competition. Are you sure?
-                  </p>
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => setShowConfirm(false)}
-                      className="flex-1 px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleFinalSubmit}
-                      className="flex-1 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
-                    >
-                      Confirm
-                    </button>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
