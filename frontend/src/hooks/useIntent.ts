@@ -18,8 +18,9 @@ const INTENT_MANAGER_ABI = [
       { name: "_filecoinCid", type: "bytes32" },
       { name: "_deadline", type: "uint256" },
       { name: "_token", type: "address" },
+      { name: "_amount", type: "uint256" },
     ],
-    outputs: [],
+    outputs: [{ name: "", type: "uint256" }],
   },
   {
     name: "intents",
@@ -97,22 +98,34 @@ export function useIntent() {
   const chainId = useChainId();
   
   const intentManagerAddress = getContractAddress(chainId, "intentManager");
+  
+  // Validate address - must be a valid non-zero address
+  const isValidAddress = intentManagerAddress && 
+    intentManagerAddress !== "0x0000000000000000000000000000000000000000" &&
+    intentManagerAddress.startsWith("0x") &&
+    intentManagerAddress.length === 42;
+  
+  const contractAddress = isValidAddress ? (intentManagerAddress as `0x${string}`) : undefined;
 
   // Get next intent ID (to track new intents)
   const { data: nextIntentId } = useContractRead({
-    address: intentManagerAddress as `0x${string}`,
+    address: contractAddress,
     abi: INTENT_MANAGER_ABI,
     functionName: "nextIntentId",
-    enabled: isConnected,
+    query: {
+      enabled: isConnected && !!contractAddress,
+    },
   });
 
   // Get user's intents
   const { data: userIntentIds, refetch: refetchUserIntents } = useContractRead({
-    address: intentManagerAddress as `0x${string}`,
+    address: contractAddress,
     abi: INTENT_MANAGER_ABI,
     functionName: "getUserIntents",
     args: address ? [address] : undefined,
-    enabled: isConnected && !!address,
+    query: {
+      enabled: isConnected && !!address && !!contractAddress,
+    },
   });
 
   // Create intent function
@@ -123,7 +136,7 @@ export function useIntent() {
     isLoading: isCreating,
     error: createError,
   } = useContractWrite({
-    address: intentManagerAddress as `0x${string}`,
+    address: contractAddress,
     abi: INTENT_MANAGER_ABI,
     functionName: "createIntent",
   });
@@ -142,11 +155,12 @@ export function useIntent() {
    */
   const createIntent = async (params: CreateIntentParams) => {
     if (!isConnected || !address) {
-      throw new Error("Wallet not connected");
+      throw new Error("Wallet not connected. Please connect your wallet first.");
     }
 
-    if (!intentManagerAddress || intentManagerAddress === "0x0000000000000000000000000000000000000000") {
-      throw new Error("Intent manager contract not deployed on this network. Please switch networks.");
+    if (!contractAddress) {
+      const networkName = chainId === 11155111 ? "Sepolia" : chainId === 84532 ? "Base Sepolia" : `Chain ${chainId}`;
+      throw new Error(`IntentManager contract not deployed on ${networkName} (Chain ID: ${chainId}). Please switch to Sepolia (11155111) or Base Sepolia (84532).`);
     }
 
     // Parse intent with Llama 3.2
@@ -169,12 +183,20 @@ export function useIntent() {
       ? `0x${params.filecoinCid.replace(/^0x/, "")}` as `0x${string}`
       : `0x${"0".repeat(64)}` as `0x${string}`; // Zero bytes32 if not provided
 
-    const deadline = params.deadline || Math.floor(Date.now() / 1000) + 86400; // Default: 24 hours
+    // Deadline must be at least 1 hour from now (MIN_DEADLINE = 1 hours)
+    // and max 30 days (MAX_DEADLINE = 30 days)
+    const minDeadline = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
+    const maxDeadline = Math.floor(Date.now() / 1000) + (30 * 24 * 3600); // 30 days from now
+    const requestedDeadline = params.deadline || Math.floor(Date.now() / 1000) + 86400; // Default: 24 hours
+    
+    // Clamp deadline to valid range
+    const deadline = Math.max(minDeadline, Math.min(requestedDeadline, maxDeadline));
+    
     const token = (params.token || "0x0000000000000000000000000000000000000000") as `0x${string}`;
     
     // Calculate value (amount in wei)
     // Extract numeric value from amount string (e.g., "$1000 USDC" -> "1000")
-    let amountValue = "0.01"; // Default
+    let amountValue = "0.01"; // Default minimum
     if (params.amount) {
       // Remove currency symbols, commas, and extract number
       const numericMatch = params.amount.replace(/[$,]/g, '').match(/(\d+\.?\d*)/);
@@ -183,23 +205,35 @@ export function useIntent() {
       }
     }
     const value = parseEther(amountValue);
+    
+    // For native ETH, the amount parameter should be 0 (value is sent via msg.value)
+    // For ERC20 tokens, the amount parameter should be the token amount
+    const amountParam = token === "0x0000000000000000000000000000000000000000" ? 0n : value;
+
+    // Validate contract address
+    if (!intentManagerAddress || intentManagerAddress === "0x0000000000000000000000000000000000000000") {
+      throw new Error(`IntentManager contract not deployed on chain ${chainId}. Please switch to Sepolia (11155111) or Base Sepolia (84532).`);
+    }
 
     // Call contract - use writeAsync for better error handling
     if (!createIntentWriteAsync && !createIntentWrite) {
-      throw new Error("Contract write function not available. Please ensure your wallet is connected and you're on the correct network.");
+      throw new Error("Contract write function not available. Please check your wallet connection and ensure you're on Sepolia or Base Sepolia network.");
     }
 
     // Prefer writeAsync for async/await pattern
+    // Note: createIntent signature: (string, bytes32, uint256, address, uint256)
+    // For native ETH: amountParam = 0, value = ETH amount in wei
+    // For ERC20: amountParam = token amount, value = 0
     if (createIntentWriteAsync) {
       await createIntentWriteAsync({
-        args: [params.intentSpec, filecoinCid, BigInt(deadline), token],
-        value: value,
+        args: [params.intentSpec, filecoinCid, BigInt(deadline), token, amountParam],
+        value: value, // For native ETH deposits (msg.value)
       });
     } else if (createIntentWrite) {
       // Fallback to synchronous write
       createIntentWrite({
-        args: [params.intentSpec, filecoinCid, BigInt(deadline), token],
-        value: value,
+        args: [params.intentSpec, filecoinCid, BigInt(deadline), token, amountParam],
+        value: value, // For native ETH deposits (msg.value)
       });
     }
   };

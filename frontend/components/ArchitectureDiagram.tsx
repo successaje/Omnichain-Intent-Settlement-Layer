@@ -21,7 +21,7 @@ export function ArchitectureDiagram() {
       id: 'user',
       label: 'User',
       icon: User,
-      position: { x: 20, y: 50 },
+      position: { x: 20, y: 25 },
       color: 'from-blue-500 to-cyan-500',
       connections: ['agents'],
       logo: null,
@@ -30,16 +30,16 @@ export function ArchitectureDiagram() {
       id: 'agents',
       label: 'AI Agents',
       icon: Brain,
-      position: { x: 50, y: 20 },
+      position: { x: 50, y: 15 },
       color: 'from-purple-500 to-pink-500',
-      connections: ['execution', 'layerzero'],
+      connections: ['execution', 'chainlink', 'filecoin'],
       logo: null,
     },
     {
       id: 'execution',
       label: 'Execution',
       icon: Zap,
-      position: { x: 80, y: 50 },
+      position: { x: 80, y: 25 },
       color: 'from-green-500 to-emerald-500',
       connections: [],
       logo: null,
@@ -48,7 +48,7 @@ export function ArchitectureDiagram() {
       id: 'layerzero',
       label: 'LayerZero',
       icon: Network,
-      position: { x: 50, y: 50 },
+      position: { x: 80, y: 55 },
       color: 'from-indigo-500 to-purple-500',
       connections: ['execution'],
       logo: 'layerzero',
@@ -59,7 +59,7 @@ export function ArchitectureDiagram() {
       icon: Shield,
       position: { x: 50, y: 80 },
       color: 'from-orange-500 to-red-500',
-      connections: ['agents'],
+      connections: ['agents', 'execution'],
       logo: 'chainlink',
     },
     {
@@ -74,30 +74,113 @@ export function ArchitectureDiagram() {
   ];
 
   const getConnectionPath = (from: Node, to: Node) => {
+    // Convert percentage positions to actual SVG coordinates
+    // The SVG viewBox should match the container dimensions
+    // Assuming container is 100% width/height, percentages map directly
+    
     const fromX = from.position.x;
     const fromY = from.position.y;
     const toX = to.position.x;
     const toY = to.position.y;
     
-    // Create curved path
+    // Calculate distance for better curve control
+    const dx = toX - fromX;
+    const dy = toY - fromY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    // Create curved path with dynamic control point
     const midX = (fromX + toX) / 2;
     const midY = (fromY + toY) / 2;
-    const controlX = midX + (toY - fromY) * 0.3;
-    const controlY = midY - (toX - fromX) * 0.3;
     
+    // Perpendicular offset for smoother curves (adjust based on distance)
+    const curveIntensity = Math.min(distance * 0.15, 8); // Max 8% offset
+    const offsetX = -dy * (curveIntensity / distance);
+    const offsetY = dx * (curveIntensity / distance);
+    
+    const controlX = midX + offsetX;
+    const controlY = midY + offsetY;
+    
+    // Use percentage-based path (SVG will scale to viewBox)
     return `M ${fromX} ${fromY} Q ${controlX} ${controlY} ${toX} ${toY}`;
   };
 
   return (
-    <div className="relative w-full h-[600px] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-2xl overflow-hidden">
-      <svg className="absolute inset-0 w-full h-full">
+    <div className="relative w-full h-[600px] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-2xl" style={{ overflow: 'visible' }}>
+      <svg 
+        className="absolute inset-0 w-full h-full" 
+        style={{ overflow: 'visible', pointerEvents: 'none' }}
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+      >
         <defs>
-          <linearGradient id="connection-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#6366f1" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.6" />
+          {/* Different gradients for different connection types - more opaque for visibility */}
+          <linearGradient id="connection-gradient-primary" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#6366f1" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="1" />
           </linearGradient>
+          <linearGradient id="connection-gradient-oracle" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f97316" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#ef4444" stopOpacity="1" />
+          </linearGradient>
+          <linearGradient id="connection-gradient-storage" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#eab308" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#f97316" stopOpacity="1" />
+          </linearGradient>
+          <linearGradient id="connection-gradient-crosschain" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#6366f1" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="1" />
+          </linearGradient>
+          
+          {/* Radial gradients for glowing beams */}
+          <radialGradient id="beam-gradient-primary" cx="50%" cy="50%">
+            <stop offset="0%" stopColor="#6366f1" stopOpacity="1" />
+            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.3" />
+          </radialGradient>
+          <radialGradient id="beam-gradient-oracle" cx="50%" cy="50%">
+            <stop offset="0%" stopColor="#f97316" stopOpacity="1" />
+            <stop offset="100%" stopColor="#ef4444" stopOpacity="0.3" />
+          </radialGradient>
+          <radialGradient id="beam-gradient-storage" cx="50%" cy="50%">
+            <stop offset="0%" stopColor="#eab308" stopOpacity="1" />
+            <stop offset="100%" stopColor="#f97316" stopOpacity="0.3" />
+          </radialGradient>
+          <radialGradient id="beam-gradient-crosschain" cx="50%" cy="50%">
+            <stop offset="0%" stopColor="#6366f1" stopOpacity="1" />
+            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.3" />
+          </radialGradient>
+          
           <marker
-            id="arrowhead"
+            id="arrowhead-primary"
+            markerWidth="10"
+            markerHeight="10"
+            refX="9"
+            refY="3"
+            orient="auto"
+          >
+            <polygon points="0 0, 10 3, 0 6" fill="#6366f1" />
+          </marker>
+          <marker
+            id="arrowhead-oracle"
+            markerWidth="10"
+            markerHeight="10"
+            refX="9"
+            refY="3"
+            orient="auto"
+          >
+            <polygon points="0 0, 10 3, 0 6" fill="#f97316" />
+          </marker>
+          <marker
+            id="arrowhead-storage"
+            markerWidth="10"
+            markerHeight="10"
+            refX="9"
+            refY="3"
+            orient="auto"
+          >
+            <polygon points="0 0, 10 3, 0 6" fill="#eab308" />
+          </marker>
+          <marker
+            id="arrowhead-crosschain"
             markerWidth="10"
             markerHeight="10"
             refX="9"
@@ -108,27 +191,126 @@ export function ArchitectureDiagram() {
           </marker>
         </defs>
 
-        {/* Connections */}
+        {/* Connections with different styles based on connection type */}
         {nodes.map((node) =>
           node.connections.map((targetId) => {
             const target = nodes.find((n) => n.id === targetId);
             if (!target) return null;
             
+            // Determine connection type and styling
+            let gradientId = 'connection-gradient-primary';
+            let beamGradientId = 'beam-gradient-primary';
+            let markerId = 'arrowhead-primary';
+            let strokeWidth = 3.5;
+            
+            if (node.id === 'chainlink' || target.id === 'chainlink') {
+              gradientId = 'connection-gradient-oracle';
+              beamGradientId = 'beam-gradient-oracle';
+              markerId = 'arrowhead-oracle';
+            } else if (node.id === 'filecoin' || target.id === 'filecoin') {
+              gradientId = 'connection-gradient-storage';
+              beamGradientId = 'beam-gradient-storage';
+              markerId = 'arrowhead-storage';
+            } else if (node.id === 'layerzero' || target.id === 'layerzero') {
+              gradientId = 'connection-gradient-crosschain';
+              beamGradientId = 'beam-gradient-crosschain';
+              markerId = 'arrowhead-crosschain';
+              strokeWidth = 4.5;
+            }
+            
+            const pathId = `path-${node.id}-${targetId}`;
+            const delay = Math.random() * 1.5;
+            
             return (
-              <motion.path
-                key={`${node.id}-${targetId}`}
-                d={getConnectionPath(node, target)}
-                stroke="url(#connection-gradient)"
-                strokeWidth="2"
-                fill="none"
-                markerEnd="url(#arrowhead)"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.6 }}
-                transition={{
-                  pathLength: { duration: 2, delay: 0.5 },
-                  opacity: { duration: 1, delay: 0.5 },
-                }}
-              />
+              <g key={`${node.id}-${targetId}`}>
+                {/* Base connection line - thicker and more visible */}
+                <motion.path
+                  id={pathId}
+                  d={getConnectionPath(node, target)}
+                  stroke={`url(#${gradientId})`}
+                  strokeWidth={strokeWidth}
+                  fill="none"
+                  markerEnd={`url(#${markerId})`}
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{
+                    pathLength: { duration: 2.5, delay: 0.5, ease: "easeInOut" },
+                    opacity: { duration: 1, delay: 0.5 },
+                  }}
+                  style={{ 
+                    filter: 'drop-shadow(0 0 8px rgba(99, 102, 241, 0.8))',
+                    strokeLinecap: 'round'
+                  }}
+                />
+                
+                {/* Animated beam/particle traveling along the path - forward */}
+                <circle
+                  r="6"
+                  fill={`url(#${beamGradientId})`}
+                  opacity={1}
+                  style={{ filter: 'drop-shadow(0 0 10px currentColor)' }}
+                >
+                  <animateMotion
+                    dur="2.5s"
+                    repeatCount="indefinite"
+                    begin={`${delay}s`}
+                  >
+                    <mpath href={`#${pathId}`} />
+                  </animateMotion>
+                </circle>
+                
+                {/* Second beam - reverse direction */}
+                <circle
+                  r="5"
+                  fill={`url(#${beamGradientId})`}
+                  opacity={0.9}
+                  style={{ filter: 'drop-shadow(0 0 8px currentColor)' }}
+                >
+                  <animateMotion
+                    dur="3s"
+                    repeatCount="indefinite"
+                    begin={`${delay + 1.2}s`}
+                    keyPoints="1;0"
+                    keyTimes="0;1"
+                    calcMode="linear"
+                  >
+                    <mpath href={`#${pathId}`} />
+                  </animateMotion>
+                </circle>
+                
+                {/* Glowing trail effect - forward */}
+                <circle
+                  r="10"
+                  fill={`url(#${beamGradientId})`}
+                  opacity={0.5}
+                >
+                  <animateMotion
+                    dur="2.5s"
+                    repeatCount="indefinite"
+                    begin={`${delay}s`}
+                  >
+                    <mpath href={`#${pathId}`} />
+                  </animateMotion>
+                </circle>
+                
+                {/* Additional smaller particles */}
+                {[0, 1, 2].map((i) => (
+                  <circle
+                    key={i}
+                    r="3"
+                    fill={`url(#${beamGradientId})`}
+                    opacity={0.7}
+                  >
+                    <animateMotion
+                      dur={`${2.5 + i * 0.5}s`}
+                      repeatCount="indefinite"
+                      begin={`${delay + i * 0.8}s`}
+                    >
+                      <mpath href={`#${pathId}`} />
+                    </animateMotion>
+                  </circle>
+                ))}
+              </g>
             );
           })
         )}
@@ -148,12 +330,13 @@ export function ArchitectureDiagram() {
               left: `${node.position.x}%`,
               top: `${node.position.y}%`,
               transform: 'translate(-50%, -50%)',
+              zIndex: 10,
             }}
           >
             <motion.div
               whileHover={{ scale: 1.1, z: 50 }}
               className={`
-                relative w-24 h-24 rounded-2xl bg-gradient-to-br ${node.color}
+                relative w-20 h-20 rounded-2xl bg-gradient-to-br ${node.color}
                 shadow-lg flex flex-col items-center justify-center text-white
                 cursor-pointer group
               `}
@@ -220,4 +403,3 @@ export function ArchitectureDiagram() {
     </div>
   );
 }
-

@@ -88,16 +88,23 @@ async function main() {
 
   console.log("\n=== Setup IntentManager ===");
 
-  // 1. Set CCIP Chain Selectors
-  console.log("\n1. Setting CCIP Chain Selectors...");
+  // 1. Add CCIP Chain Selectors
+  console.log("\n1. Adding CCIP Chain Selectors...");
   for (const [chainName, selector] of Object.entries(chainSelectors)) {
     if (chainName !== networkName) {
       try {
-        const tx = await IntentManager.setCcipChainSelector(chainName, selector);
+        // Check if already added
+        const isSupported = await IntentManager.supportedChainSelectors(selector);
+        if (isSupported) {
+          console.log(`   ℹ️  CCIP selector for ${chainName} already added: ${selector}`);
+          continue;
+        }
+        
+        const tx = await IntentManager.addChainSelector(selector);
         await tx.wait();
-        console.log(`   ✅ Set CCIP selector for ${chainName}: ${selector}`);
+        console.log(`   ✅ Added CCIP selector for ${chainName}: ${selector}`);
       } catch (error: any) {
-        console.log(`   ⚠️  Failed to set CCIP selector for ${chainName}: ${error.message}`);
+        console.log(`   ⚠️  Failed to add CCIP selector for ${chainName}: ${error.message}`);
       }
     }
   }
@@ -105,68 +112,71 @@ async function main() {
   // 2. Authorize Executors
   console.log("\n2. Authorizing Executors...");
   try {
-    const tx1 = await IntentManager.setExecutor(deployer.address, true);
-    await tx1.wait();
-    console.log(`   ✅ Authorized executor: ${deployer.address}`);
+    // Check if already authorized
+    const isExecutor = await IntentManager.validExecutors(deployer.address);
+    if (isExecutor) {
+      console.log(`   ℹ️  Executor already authorized: ${deployer.address}`);
+    } else {
+      const tx1 = await IntentManager.addExecutor(deployer.address);
+      await tx1.wait();
+      console.log(`   ✅ Authorized executor: ${deployer.address}`);
+    }
   } catch (error: any) {
     console.log(`   ⚠️  Failed to authorize executor: ${error.message}`);
   }
 
-  // 3. Set Oracle Adapter
-  console.log("\n3. Setting Oracle Adapter...");
+  // 3. Add Oracle
+  console.log("\n3. Adding Oracle...");
   try {
-    const tx = await IntentManager.setOracleAdapter(addresses.oracleAdapter);
-    await tx.wait();
-    console.log(`   ✅ Set oracle adapter: ${addresses.oracleAdapter}`);
+    // Check if already added
+    const isOracle = await IntentManager.validOracles(addresses.oracleAdapter);
+    if (isOracle) {
+      console.log(`   ℹ️  Oracle already added: ${addresses.oracleAdapter}`);
+    } else {
+      const tx = await IntentManager.addOracle(addresses.oracleAdapter);
+      await tx.wait();
+      console.log(`   ✅ Added oracle: ${addresses.oracleAdapter}`);
+    }
   } catch (error: any) {
-    console.log(`   ⚠️  Failed to set oracle adapter: ${error.message}`);
+    console.log(`   ⚠️  Failed to add oracle: ${error.message}`);
   }
 
   // 4. Configure Payment Escrow Releasers
   console.log("\n4. Configuring Payment Escrow Releasers...");
   try {
-    // Authorize IntentManager as releaser
-    const tx1 = await PaymentEscrow.authorizeReleaser(addresses.intentManager, true);
-    await tx1.wait();
-    console.log(`   ✅ Authorized IntentManager as releaser`);
+    // Check and authorize IntentManager as releaser
+    const isIntentManagerReleaser = await PaymentEscrow.authorizedReleasers(addresses.intentManager);
+    if (isIntentManagerReleaser) {
+      console.log(`   ℹ️  IntentManager already authorized as releaser`);
+    } else {
+      const tx1 = await PaymentEscrow.addAuthorizedReleaser(addresses.intentManager);
+      await tx1.wait();
+      console.log(`   ✅ Authorized IntentManager as releaser`);
+    }
 
-    // Authorize ExecutionProxy as releaser
-    const tx2 = await PaymentEscrow.authorizeReleaser(addresses.executionProxy, true);
-    await tx2.wait();
-    console.log(`   ✅ Authorized ExecutionProxy as releaser`);
+    // Check and authorize ExecutionProxy as releaser
+    const isExecutionProxyReleaser = await PaymentEscrow.authorizedReleasers(addresses.executionProxy);
+    if (isExecutionProxyReleaser) {
+      console.log(`   ℹ️  ExecutionProxy already authorized as releaser`);
+    } else {
+      const tx2 = await PaymentEscrow.addAuthorizedReleaser(addresses.executionProxy);
+      await tx2.wait();
+      console.log(`   ✅ Authorized ExecutionProxy as releaser`);
+    }
   } catch (error: any) {
     console.log(`   ⚠️  Failed to configure payment escrow: ${error.message}`);
   }
 
-  // 5. Set Execution Proxy in IntentManager
-  console.log("\n5. Setting Execution Proxy...");
-  try {
-    const tx = await IntentManager.setExecutionProxy(addresses.executionProxy);
-    await tx.wait();
-    console.log(`   ✅ Set execution proxy: ${addresses.executionProxy}`);
-  } catch (error: any) {
-    console.log(`   ⚠️  Failed to set execution proxy: ${error.message}`);
-  }
-
-  // 6. Set Agent Registry in IntentManager
-  console.log("\n6. Setting Agent Registry...");
-  try {
-    const tx = await IntentManager.setAgentRegistry(addresses.agentRegistry);
-    await tx.wait();
-    console.log(`   ✅ Set agent registry: ${addresses.agentRegistry}`);
-  } catch (error: any) {
-    console.log(`   ⚠️  Failed to set agent registry: ${error.message}`);
-  }
-
-  // 7. Set Payment Escrow in IntentManager
-  console.log("\n7. Setting Payment Escrow...");
-  try {
-    const tx = await IntentManager.setPaymentEscrow(addresses.paymentEscrow);
-    await tx.wait();
-    console.log(`   ✅ Set payment escrow: ${addresses.paymentEscrow}`);
-  } catch (error: any) {
-    console.log(`   ⚠️  Failed to set payment escrow: ${error.message}`);
-  }
+  // Note: IntentManager doesn't have setter functions for executionProxy, agentRegistry, or paymentEscrow
+  // These contracts are used independently and don't need to be "set" in IntentManager
+  // The IntentManager can work with them via their addresses when needed
+  console.log("\n5. Contract Relationships:");
+  console.log(`   ℹ️  IntentManager: ${addresses.intentManager}`);
+  console.log(`   ℹ️  AgentRegistry: ${addresses.agentRegistry}`);
+  console.log(`   ℹ️  PaymentEscrow: ${addresses.paymentEscrow}`);
+  console.log(`   ℹ️  ExecutionProxy: ${addresses.executionProxy}`);
+  console.log(`   ℹ️  OracleAdapter: ${addresses.oracleAdapter}`);
+  console.log(`   ℹ️  These contracts work together but don't need explicit "set" calls in IntentManager`);
 
   // 8. Register a test agent (optional)
   console.log("\n8. Registering Test Agent (optional)...");
